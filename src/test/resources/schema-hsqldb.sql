@@ -3,6 +3,7 @@
 DROP TABLE CLICK IF EXISTS;
 DROP TABLE SHORTURL IF EXISTS;
 DROP TABLE USER IF EXISTS;
+DROP TABLE USER_ROLES IF EXISTS;
 
 -- ShortURL
 
@@ -43,4 +44,14 @@ CREATE TABLE USER
     PASSWORD VARCHAR(50)                                                  -- Password
 );
 
+CREATE TABLE USER_ROLE
+(
+    ID  BIGINT IDENTITY PRIMARY KEY,                                        -- KEY
+    USERNAME VARCHAR(15),                                                   -- Username
+    ROLE VARCHAR(45) NOT NULL                                               -- Role
+);
+
 ALTER TABLE SHORTURL ADD FOREIGN KEY (OWNER) REFERENCES USER (ID);
+ALTER TABLE USER_ROLE ADD FOREIGN KEY (USERNAME) REFERENCES USER (USERNAME);
+INSERT INTO USER (USERNAME, PASSWORD) VALUES ('Admin','1234');
+INSERT INTO USER_ROLE (USERNAME, ROLE) VALUES ('Admin','ADMIN');

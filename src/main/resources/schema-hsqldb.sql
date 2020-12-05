@@ -40,7 +40,18 @@ CREATE TABLE USER
 (
     ID       BIGINT IDENTITY PRIMARY KEY,                                 -- KEY
     USERNAME VARCHAR(15) UNIQUE,                                          -- Username
-    PASSWORD VARCHAR(50)                                                  -- Password
+    PASSWORD VARCHAR(50),                                                 -- Password
+    ROLE     INT                                                          -- ROLE ID
+);
+
+CREATE TABLE ROLE
+(
+    ID INT IDENTITY PRIMARY KEY,
+    ROLE_NAME VARCHAR(20)
 );
 
 ALTER TABLE SHORTURL ADD FOREIGN KEY (OWNER) REFERENCES USER (ID);
+ALTER TABLE USER ADD FOREIGN KEY (ROLE) REFERENCES ROLE (ID);
+INSERT INTO ROLE(ROLE_NAME) VALUES ('ROLE_ADMIN');
+INSERT INTO ROLE(ROLE_NAME) VALUES ('ROLE_USER');
+

@@ -1,6 +1,7 @@
 package urlshortener.service;
 
 import org.springframework.stereotype.Service;
+import urlshortener.domain.Role;
 import urlshortener.domain.User;
 import urlshortener.repository.UserRepository;
 
@@ -17,6 +18,7 @@ public class UserService {
     User u = UserBuilder.newInstance()
         .username(username)
         .password(password)
+        .roleId(Role.ID_ROLE_USER)
         .build();
 
     return userRepository.save(u);
@@ -29,6 +31,10 @@ public class UserService {
             .build();
 
     return userRepository.login(u);
+  }
+
+  public User getUser(String username) {
+    return userRepository.getUser(username);
   }
 
     public boolean exists(String userId) {

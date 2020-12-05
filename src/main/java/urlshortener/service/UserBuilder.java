@@ -6,6 +6,7 @@ public class UserBuilder {
 
   private String username;
   private String password;
+  private int roleId;
 
   static UserBuilder newInstance() {
     return new UserBuilder();
@@ -14,7 +15,8 @@ public class UserBuilder {
   User build() {
     return new User(
         username,
-        password
+        password,
+            roleId
     );
   }
 
@@ -25,6 +27,11 @@ public class UserBuilder {
 
   UserBuilder password(String password) {
     this.password = password;
+    return this;
+  }
+
+  UserBuilder roleId(int roleId) {
+    this.roleId = roleId;
     return this;
   }
 

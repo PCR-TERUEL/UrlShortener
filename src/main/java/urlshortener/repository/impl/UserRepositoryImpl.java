@@ -20,7 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
       .getLogger(UserRepositoryImpl.class);
 
   private static final RowMapper<User> rowMapper =
-      (rs, rowNum) -> new User(rs.getString("username"), rs.getString("password"));
+      (rs, rowNum) -> new User(rs.getString("username"), rs.getString("password"), rs.getInt("role"));
 
   private static final RowMapper<Long> rowMapperId =
           (rs, rowNum) -> rs.getLong(1);
@@ -91,6 +91,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     return listUsers.get(0);
+  }
+
+  @Override
+  public User getUser(String username) {
+    User u = jdbc.query("SELECT * FROM user WHERE USERNAME = ?",
+            new Object[] {username}, rowMapper).get(0);
+
+    return u;
   }
 
   @Override
