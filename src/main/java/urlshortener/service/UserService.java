@@ -18,7 +18,7 @@ public class UserService {
     User u = UserBuilder.newInstance()
         .username(username)
         .password(password)
-        .roleId(Role.ID_ROLE_USER)
+        .roleId(Role.ROLE_USER)
         .build();
 
     return userRepository.save(u);

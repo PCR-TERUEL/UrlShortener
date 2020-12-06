@@ -74,7 +74,7 @@ function getShortURLFromCSV() {
             retval += msg.target + ";" + msg.uri + ";0\n";
             msg.clicks = 0;
             appendRow(msg);
-            if (num_processed_lines < lines.length) {
+            if (num_processed_lines < lines.length && lines[num_processed_lines] !== "") {
                 getShortURLFromCSV();
             }else{
                 download("result.csv", retval);
@@ -90,7 +90,6 @@ function getShortURLFromCSV() {
             } else {
                 download("result.csv", retval);
             }
-
         }
     });
 }
