@@ -112,7 +112,6 @@ function getData(){
     $.ajax({
         type: "POST",
         url: URL_SERVER + "/userlinks",
-        data: {uuid:getCookie("uuid")},
         success: function (msg) {
             links = msg.urlList;
             for(var i = 0; i < links.length; i ++){
@@ -121,7 +120,7 @@ function getData(){
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            window.location.replace(URL_SERVER + "/index.html")
+            window.location.replace(URL_SERVER + "/error")
         }
     });
 }

@@ -1,5 +1,6 @@
 package urlshortener.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import urlshortener.domain.Role;
 import urlshortener.domain.User;
@@ -8,6 +9,9 @@ import urlshortener.repository.UserRepository;
 @Service
 public class UserService {
 
+
+
+  @Autowired
   private final UserRepository userRepository;
 
   public UserService(UserRepository userRepository) {

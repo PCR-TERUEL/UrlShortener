@@ -1,20 +1,27 @@
 package urlshortener.domain;
 
-import java.util.Set;
 
-public class User {
+import javax.persistence.*;
+import java.io.Serializable;
 
+@Entity
+public class User implements Serializable {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
   private String username;
   private String password;
   private int roleId;
-  private Set<Role> roles;
 
   public User(String username, String password, int roleId) {
     this.username = username;
     this.password = password;
     this.roleId = roleId;
   }
+
+  public User() { }
+
 
   public String getUsername() {
     return username;

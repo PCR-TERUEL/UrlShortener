@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="https://www.thymeleaf.org">
+
 <head>
     <meta charset="utf-8">
     <title>Ataja</title>
@@ -56,18 +57,18 @@
 <body>
 <div class="container" id="container">
     <div class="form-container sign-up-container">
-        <form action="">
+        <form action="/singup" method="POST" >
             <h1>Regístrate</h1>
-            <input type="text"     name="username"             id="register-username"     placeholder="Nombre de usuario" />
-            <input type="password" name="register-password"    id="register-password"     placeholder="Contraseña" />
+            <input type="text"     name="username"             id="register-username"     placeholder="Nombre de usuario"   th:field="*{username}"/>
+            <input type="password" name="register-password"    id="register-password"     placeholder="Contraseña" th:field="*{password}"/>
             <input type="password" name="repeat_pswd"          id="register-confirm-password"  placeholder="Confirma contraseña" />
-            <input type="button" id="register" value="Regístrate">
+            <input type="submit" value="Regístrate">
             <div id="register-feedback" class="invalid"></div>
         </form>
 
     </div>
     <div class="form-container sign-in-container">
-        <form action="" id="login-form">
+        <form>
             <h1>Inicia sesión</h1>
             <input type="text" name="username" id="login-username" placeholder="Nombre de usuario" />
             <input type="password" name="password" id="login-password" placeholder="Contraseña" />

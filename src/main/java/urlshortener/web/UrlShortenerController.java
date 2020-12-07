@@ -1,22 +1,25 @@
 package urlshortener.web;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import net.minidev.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.RedirectView;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.ClickService;
@@ -24,26 +27,20 @@ import urlshortener.service.ShortURLService;
 import urlshortener.service.URLValidatorService;
 import urlshortener.service.UserService;
 
-@RestController
+@Controller
 public class UrlShortenerController implements WebMvcConfigurer {
   public static final String HOST = "localhost:8080";
   private static final String STATUS_OK = "OK";
   private static final String STATUS_ERROR = "ERROR";
-  //public static final String HOST = "localhost";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
+
   private final UserService userService;
 
   public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService) {
     this.shortUrlService = shortUrlService;
     this.clickService = clickService;
     this.userService = userService;
-  }
-
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/static/**")
-            .addResourceLocations("classpath:/static");
   }
 
   /**
@@ -57,7 +54,8 @@ public class UrlShortenerController implements WebMvcConfigurer {
    * @apiError UrlNotFound The url was not found.
    */
 
-  @RequestMapping(value = "/{id:(?!link|api|index|login|panel).*}", method = RequestMethod.GET)
+
+  @RequestMapping(value = "/r/{id:(?).*}", method = RequestMethod.GET)
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
     if(shortUrlService.isExpired(id)) {
@@ -88,17 +86,15 @@ public class UrlShortenerController implements WebMvcConfigurer {
    * @apiError 226 Username already exists.
    */
 
-  @RequestMapping(value = "/register", method = RequestMethod.POST)
+  @RequestMapping(value = "/singup", method = RequestMethod.POST)
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
     if(username.equals("") || password.equals("")){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    System.out.println("Username: " + username + " Password: " + password);
 
     User u = userService.save(username, password);
 
-    System.out.println("Test: " + u.getPassword());
     if (u != null) {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put("uuid", u.getId());
@@ -106,36 +102,6 @@ public class UrlShortenerController implements WebMvcConfigurer {
       return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
     } else {
       return new ResponseEntity<>(HttpStatus.IM_USED);
-    }
-  }
-
-  /**
-   * @api {post} /login User login
-   * @apiName User login
-   * @apiGroup User
-   *
-   * @apiParam {String} username Username.
-   * @apiParam {String} password Password.
-   *
-   * @apiSuccess 202 User login successful.
-   * @apiError  400 Bad user parameters.
-   * @apiError 203 Wrong user or password.
-   */
-
-  @RequestMapping(value = "/login", method = RequestMethod.POST)
-  public ResponseEntity<?> login(@RequestParam("username") String username,
-                                    @RequestParam("password") String password) {
-    if(username.equals("") || password.equals("")){
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    User u = userService.login(username, password);
-    if (u != null) {
-      JSONObject jsonObject = new JSONObject();
-      jsonObject.put("uuid", u.getId());
-      return new ResponseEntity<>(jsonObject, HttpStatus.ACCEPTED);
-    } else {
-      return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
     }
   }
 
@@ -155,16 +121,17 @@ public class UrlShortenerController implements WebMvcConfigurer {
 
   @RequestMapping(value = "/link", method = RequestMethod.POST)
   public ResponseEntity<?> shortener(@RequestParam("url") String url,
-                                            @RequestParam(value = "sponsor", required = false) String sponsor,
-                                            @RequestParam("uuid") String userId,
+                                     @RequestParam(value = "sponsor", required = false) String sponsor,
                                             HttpServletRequest request) {
 
+    User u = getCurrentUser();
+
     URLValidatorService urlValidator = new URLValidatorService(url);
-    if(!userService.exists(userId)){
+    if(!userService.exists(String.valueOf(u.getId()))) {
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
     if (urlValidator.isValid()) {
-      ShortURL su = shortUrlService.save(url, sponsor, userId, request.getRemoteAddr());
+      ShortURL su = shortUrlService.save(url, sponsor, String.valueOf(u.getId()), request.getRemoteAddr());
       HttpHeaders h = new HttpHeaders();
       h.setLocation(su.getUri());
       return new ResponseEntity<>(su, h, HttpStatus.CREATED);
@@ -188,17 +155,17 @@ public class UrlShortenerController implements WebMvcConfigurer {
    */
 
   @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
-  public ResponseEntity<?> getUserLinks(@RequestParam("uuid") String userId,
-                                                 HttpServletRequest request) {
+  public ResponseEntity<?> getUserLinks(HttpServletRequest request) {
+    User u = getCurrentUser();
 
-    if(!userService.exists(userId)){
+    if(!userService.exists(String.valueOf(u.getId()))) {
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
-    JSONObject urlShort = shortUrlService.findByUser(userId);
+
+    JSONObject urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
     return new ResponseEntity<>(urlShort, HttpStatus.OK);
 
   }
-
 
   private String extractIP(HttpServletRequest request) {
     return request.getRemoteAddr();
@@ -214,9 +181,15 @@ public class UrlShortenerController implements WebMvcConfigurer {
     return jsonResponse;
   }
 
+  private User getCurrentUser() {
+    UserDetails ud =  (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return userService.getUser(ud.getUsername());
+  }
+
   private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
     HttpHeaders h = new HttpHeaders();
     h.setLocation(URI.create(l.getTarget()));
     return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
   }
+
 }

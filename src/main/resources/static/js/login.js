@@ -19,14 +19,12 @@ $(document).ready(function () {
                 url: URL_SERVER + "/login",
                 data: {username: $("#login-username").val(), password: $("#login-password").val()},
                 success: function (msg, statusText, xhr) {
-                    if (xhr.status === 202) {
-                        document.cookie = "uuid=" + msg.uuid;
-                        console.log("entro al success de login ");
-                        window.location.replace(URL_SERVER + "/panel.html")
-                    } else {
+                    if (xhr.status != 200) {
                         var feedbackDiv = $("#login-feedback");
                         feedbackDiv.empty();
                         feedbackDiv.html("El usuario o la contraseña erróneos");
+                    } else {
+                        location.href = "panel"
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {

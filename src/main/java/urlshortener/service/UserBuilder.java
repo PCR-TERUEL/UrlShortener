@@ -16,7 +16,7 @@ public class UserBuilder {
     return new User(
         username,
         password,
-            roleId
+        roleId
     );
   }
 

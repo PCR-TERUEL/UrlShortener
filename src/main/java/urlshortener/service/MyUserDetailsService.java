@@ -7,42 +7,35 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import urlshortener.domain.User;
+import org.springframework.security.core.userdetails.User;
 
-//import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
     private UserService userService;
 
     @Override
-   // @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.getUser(username);
-        List<GrantedAuthority> authorities = getUserAuthority(user.getRoleId());
-        return buildUserForAuthentication(user, authorities);
+        System.out.println("Hello, Spring Security!");
+        urlshortener.domain.User user = userService.getUser(username);
+        System.out.println(user.getUsername() + " " + user.getPassword());
+
+        return User.builder()
+                .username(user.getUsername())
+                .password(bCryptPasswordEncoder.encode(user.getPassword()))
+                .disabled(false)
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .roles("USER")
+                .build();
     }
 
-    private List<GrantedAuthority> getUserAuthority(int roleId) {
-        Set<GrantedAuthority> roles = new HashSet<GrantedAuthority>();
-        if (roleId == 0) {
-            roles.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        } else {
-            roles.add(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);
-        return grantedAuthorities;
-    }
-
-    private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                true, true, true, true, authorities);
-    }
 }
