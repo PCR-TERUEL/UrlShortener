@@ -37,13 +37,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/index", "/login", "/singup", "*.html", "/apidoc_files/**",
+                .antMatchers("/", "/index", "/login", "/singup", "/error", "error_no", "*.html", "/apidoc_files/**",
                                         "/contactform/**", "/css/**", "/img/**", "/js/**", "/lib/**").permitAll()
                 .and()
-                .authorizeRequests().antMatchers("/panel","/test").hasAnyRole("USER")
+                .authorizeRequests().antMatchers("/admin").hasRole("ADMIN")
+                .and()
+                .authorizeRequests().antMatchers("/panel").hasAnyRole("USER", "ADMIN")
                 .and()
                 .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll();
-
     }
 
     @Bean

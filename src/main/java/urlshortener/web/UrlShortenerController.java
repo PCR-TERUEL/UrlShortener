@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ import urlshortener.service.URLValidatorService;
 import urlshortener.service.UserService;
 
 @Controller
-public class UrlShortenerController implements WebMvcConfigurer {
+public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
   public static final String HOST = "localhost:8080";
   private static final String STATUS_OK = "OK";
   private static final String STATUS_ERROR = "ERROR";
@@ -93,13 +94,10 @@ public class UrlShortenerController implements WebMvcConfigurer {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    User u = userService.save(username, password);
+    boolean registered = userService.save(username, password);
 
-    if (u != null) {
-      JSONObject jsonObject = new JSONObject();
-      jsonObject.put("uuid", u.getId());
-      jsonObject = createJSONResponse(STATUS_OK, jsonObject);
-      return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);
+    if (registered) {
+      return new ResponseEntity<>(HttpStatus.CREATED);
     } else {
       return new ResponseEntity<>(HttpStatus.IM_USED);
     }
@@ -161,10 +159,16 @@ public class UrlShortenerController implements WebMvcConfigurer {
     if(!userService.exists(String.valueOf(u.getId()))) {
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
-
     JSONObject urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
+    System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
+
     return new ResponseEntity<>(urlShort, HttpStatus.OK);
 
+  }
+
+  @RequestMapping("/error")
+  public String error() {
+    return "error_no";
   }
 
   private String extractIP(HttpServletRequest request) {
@@ -183,6 +187,8 @@ public class UrlShortenerController implements WebMvcConfigurer {
 
   private User getCurrentUser() {
     UserDetails ud =  (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    User u = userService.getUser(ud.getUsername());
+    //System.out.println("Hi, I'm " + u.getUsername());
     return userService.getUser(ud.getUsername());
   }
 
@@ -192,4 +198,8 @@ public class UrlShortenerController implements WebMvcConfigurer {
     return new ResponseEntity<>(h, HttpStatus.valueOf(l.getMode()));
   }
 
+  @Override
+  public String getErrorPath() {
+    return null;
+  }
 }

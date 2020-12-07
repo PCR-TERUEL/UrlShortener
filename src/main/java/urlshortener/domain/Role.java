@@ -28,11 +28,4 @@ public class Role {
         this.id = id;
     }
 
-    public String getRoleById(int id) {
-        if(id == ROLE_ADMIN) {
-            return "ADMIN";
-        } else {
-            return "USER";
-        }
-    }
 }

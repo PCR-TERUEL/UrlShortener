@@ -9,12 +9,13 @@ public class User implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private String id;
   private String username;
   private String password;
   private int roleId;
 
-  public User(String username, String password, int roleId) {
+  public User(String id, String username, String password, int roleId) {
+    this.id = id;
     this.username = username;
     this.password = password;
     this.roleId = roleId;
@@ -39,11 +40,11 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  public long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

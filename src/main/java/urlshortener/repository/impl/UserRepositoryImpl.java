@@ -19,7 +19,8 @@ public class UserRepositoryImpl implements UserRepository {
       .getLogger(UserRepositoryImpl.class);
 
   private static final RowMapper<User> rowMapper =
-    (rs, rowNum) -> new User(rs.getString("username"), rs.getString("password"), rs.getInt("role"));
+    (rs, rowNum) -> new User(rs.getString("id"), rs.getString("username"),
+            rs.getString("password"), rs.getInt("role"));
   private final JdbcTemplate jdbc;
 
   public UserRepositoryImpl(JdbcTemplate jdbc) {
@@ -27,18 +28,17 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public User save(User u) {
+  public boolean save(User u) {
     try {
       jdbc.update("INSERT INTO user VALUES (?, ?,?)", null, u.getUsername(), u.getPassword());
-      u.setId(getId(u.getUsername()));
+      return true;
     } catch (DuplicateKeyException e) {
       log.debug("When insert for key {}", u.getUsername(), e);
-      return null;
     } catch (Exception e) {
       log.debug("When insert", e);
-      return null;
     }
-    return u;
+
+    return false;
   }
 
 
@@ -60,16 +60,6 @@ public class UserRepositoryImpl implements UserRepository {
       log.debug("When select for limit " + limit + " and offset "
           + offset, e);
       return Collections.emptyList();
-    }
-  }
-
-  @Override
-  public long getId(String username) {
-    try {
-      User u = jdbc.query("SELECT ID FROM user WHERE USERNAME = ?", new Object[] {username}, rowMapper).get(0);
-      return u.getId();
-    } catch (Exception e) {
-      return -1;
     }
   }
 

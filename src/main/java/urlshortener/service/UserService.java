@@ -18,8 +18,9 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
-  public User save(String username, String password) {
+  public boolean save(String username, String password) {
     User u = UserBuilder.newInstance()
+        .id("-1")
         .username(username)
         .password(password)
         .roleId(Role.ROLE_USER)

@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
+import urlshortener.domain.Role;
 
 
 @Service
@@ -34,8 +35,17 @@ public class MyUserDetailsService implements UserDetailsService {
                 .accountExpired(false)
                 .accountLocked(false)
                 .credentialsExpired(false)
-                .roles("USER")
+                .roles(getRoleName(user))
                 .build();
+    }
+
+    private String getRoleName( urlshortener.domain.User u) {
+        if (u.getRoleId() == Role.ROLE_ADMIN) {
+            return "ADMIN";
+        } else {
+            return "USER";
+        }
+
     }
 
 }
