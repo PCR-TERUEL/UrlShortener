@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.minidev.json.JSONObject;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.RedirectView;
 import urlshortener.config.JWTTokenUtil;
+import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
@@ -85,16 +88,14 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     }
   }
 
-  @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-  public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
-                                                     @RequestParam String password) throws Exception {
-    System.out.println("POST Login request!");
+  @RequestMapping(value = "/login")
+  public String login() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth.getPrincipal() instanceof  UserDetails) {
+      return "redirect:/panel";
+    }
 
-    authenticate(username, password);
-    UserDetails userDetails = secureUserService.loadUserByUsername(username);
-    String token = jwtTokenUtil.generateToken(userDetails);
-
-    return ResponseEntity.ok(token);
+    return "userlogin";
   }
 
   @RequestMapping(value = "/test", method = RequestMethod.GET)
@@ -103,6 +104,19 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return ResponseEntity.ok("ok");
   }
 
+  @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+  public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
+                                                     @RequestParam String password,
+                                                     HttpServletResponse response) throws Exception {
+    System.out.println("POST Login request!");
+
+    authenticate(username, password);
+    UserDetails userDetails = secureUserService.loadUserByUsername(username);
+    String token = jwtTokenUtil.generateToken(userDetails);
+    response.addCookie(new Cookie("token", "Bearer " + token));
+
+    return ResponseEntity.ok(new JWT(token));
+  }
 
 
   /**
@@ -121,6 +135,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @RequestMapping(value = "/singup", method = RequestMethod.POST)
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
+    System.out.println("POST Singup request: " + username +":" +password);
     if(username.equals("") || password.equals("")){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -133,6 +148,13 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       return new ResponseEntity<>(HttpStatus.IM_USED);
     }
   }
+
+  @RequestMapping(value = "/delete", method = RequestMethod.GET)
+  public ResponseEntity<?> delete() {
+   return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+
 
   /**
    * @api {post} /link Create short link
@@ -196,6 +218,8 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return new ResponseEntity<>(urlShort, HttpStatus.OK);
 
   }
+
+
 
   @RequestMapping("/error")
   public String error() {

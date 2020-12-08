@@ -1,6 +1,9 @@
 package urlshortener.config;
 
+import org.apache.tomcat.util.http.LegacyCookieProcessor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,8 +71,13 @@ public class PersistenceConfiguration implements WebMvcConfigurer {
     registry.addViewController("/").setViewName("index");
     registry.addViewController("/login").setViewName("login");
     registry.addViewController("/panel").setViewName("panel");
-    //registry.addViewController("/error").setViewName("error");
+    registry.addViewController("/error").setViewName("error");
   }
 
+  @Bean
+  public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
+    return (serverFactory) -> serverFactory.addContextCustomizers(
+            (context) -> context.setCookieProcessor(new LegacyCookieProcessor()));
+  }
 
 }

@@ -16,15 +16,17 @@ $(document).ready(function () {
             container.removeClass("right-panel-active");
             $.ajax({
                 type: "POST",
-                url: URL_SERVER + "/login",
+                url: URL_SERVER + "/authenticate",
                 data: {username: $("#login-username").val(), password: $("#login-password").val()},
                 success: function (msg, statusText, xhr) {
-                    if (xhr.status != 200) {
+                    if (xhr.status === 200) {
+                        //document.cookie = "token=Bearer " + msg.token;
+                        console.log("entro al success de login ");
+                        window.location.replace(URL_SERVER + "/panel")
+                    } else {
                         var feedbackDiv = $("#login-feedback");
                         feedbackDiv.empty();
                         feedbackDiv.html("El usuario o la contraseña erróneos");
-                    } else {
-                        location.href = "panel"
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -43,13 +45,13 @@ $(document).ready(function () {
         if(validateRegisterFields($("#register-username"), $("#register-password"), $("#register-confirm-password"))){
             $.ajax({
                 type: "POST",
-                url: URL_SERVER + "/register",
+                url: URL_SERVER + "/singup",
                 data: {username: $("#register-username").val(), password: $("#register-password").val()},
                 success: function (msg, statusText, xhr) {
                     if (xhr.status === 201) {
-                        document.cookie = "uuid=" + msg.uuid;
-                        document.cookie = "username=" + $("#register-username").val();
-                        window.location.replace(URL_SERVER + "/panel.html")
+                        //document.cookie = "token= Bearer" + msg.token;
+                        //document.cookie = "username=" + $("#register-username").val();
+                        window.location.replace(URL_SERVER + "/panel")
                     }else if (xhr.status === 226){
                         var feedbackDiv = $("#register-feedback");
                         feedbackDiv.empty();

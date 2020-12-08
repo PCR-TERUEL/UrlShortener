@@ -12,7 +12,7 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: URL_SERVER + "/link",
-            data: {url: $("#id-url-input").val(), uuid: getCookie("uuid")},
+            data: {url: $("#id-url-input").val()},
             success: function (msg) {
                 msg.clicks = 0;
                 appendRow(msg);
@@ -67,7 +67,7 @@ function getShortURLFromCSV() {
     $.ajax({
         type: "POST",
         url: URL_SERVER + "/link",
-        data: {url: lines[num_processed_lines] , uuid: getCookie("uuid")},
+        data: {url: lines[num_processed_lines]},
         success: function (msg) {
             num_processed_lines ++;
             console.log(num_processed_lines + "  " + msg.uri);
@@ -120,7 +120,7 @@ function getData(){
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            window.location.replace(URL_SERVER + "/error")
+            window.location.replace(URL_SERVER + "/index.html")
         }
     });
 }

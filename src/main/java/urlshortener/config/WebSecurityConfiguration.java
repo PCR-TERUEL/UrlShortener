@@ -54,12 +54,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
-                "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**",
-                "/css/**", "/img/**", "/js/**", "/lib/**").permitAll().anyRequest().authenticated()
+        http.csrf().disable().authorizeRequests()
+        .antMatchers("/panel").hasRole("USER")
+        .and()
+        .authorizeRequests().antMatchers("/delete").hasRole("ADMIN")
+        .and()
+        .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll()
+        .and().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
+        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**",
+        "/css/**", "/img/**", "/js/**", "/lib/**", "/images").permitAll().anyRequest().authenticated()
+        .and()
+        .exceptionHandling().accessDeniedPage("/login?=unauthorized")
         .and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         /*

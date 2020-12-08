@@ -30,14 +30,15 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public boolean save(User u) {
     try {
-      jdbc.update("INSERT INTO user VALUES (?, ?,?)", null, u.getUsername(), u.getPassword());
+      jdbc.update("INSERT INTO USER(USERNAME, PASSWORD, ROLE) VALUES (?,?,?)",
+              u.getUsername(), u.getPassword(), 1);
       return true;
     } catch (DuplicateKeyException e) {
       log.debug("When insert for key {}", u.getUsername(), e);
     } catch (Exception e) {
-      log.debug("When insert", e);
+      System.out.println(e);
     }
-
+    System.out.print("Cosa mala...");
     return false;
   }
 
