@@ -9,8 +9,6 @@ import urlshortener.repository.UserRepository;
 @Service
 public class UserService {
 
-
-
   @Autowired
   private final UserRepository userRepository;
 
@@ -30,11 +28,13 @@ public class UserService {
   }
 
   public User login(String username, String password) {
+    System.out.println("Llego aquí?????");
     User u = UserBuilder.newInstance()
             .username(username)
             .password(password)
             .build();
 
+    System.out.println("Llego aquí?????");
     return userRepository.login(u);
   }
 

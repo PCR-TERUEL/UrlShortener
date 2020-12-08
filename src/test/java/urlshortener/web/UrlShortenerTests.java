@@ -15,6 +15,7 @@ import static urlshortener.fixtures.ShortURLFixture.someUrl;
 
 import java.net.URI;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.junit.Before;
@@ -169,7 +170,7 @@ public class UrlShortenerTests {
 
   private void configureUserSave(String username, String password) {
     when(userService.save(any(),  any()))
-            .then((Answer<User>) invocation -> new User(username, password));
+            .then((Answer<User>) invocation -> new User("0", username, password,1)); // OJO!! Lo he tocado para hacer el apaño, estará mal.
   }
 
 

@@ -12,6 +12,9 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -21,12 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.RedirectView;
+import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
-import urlshortener.service.ClickService;
-import urlshortener.service.ShortURLService;
-import urlshortener.service.URLValidatorService;
-import urlshortener.service.UserService;
+import urlshortener.service.*;
 
 @Controller
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -35,14 +36,24 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   private static final String STATUS_ERROR = "ERROR";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
-
+  private final MyUserDetailsService secureUserService;
   private final UserService userService;
 
-  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService) {
+  @Autowired
+  private AuthenticationManager authenticationManager;
+
+  @Autowired
+  private JWTTokenUtil jwtTokenUtil;
+
+  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService,
+                                MyUserDetailsService secureUserService) {
     this.shortUrlService = shortUrlService;
     this.clickService = clickService;
     this.userService = userService;
+    this.secureUserService = secureUserService;
   }
+
+
 
   /**
    * @api {get} /{id:(?!link|index).*} Shortened url
@@ -73,6 +84,26 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       }
     }
   }
+
+  @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+  public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
+                                                     @RequestParam String password) throws Exception {
+    System.out.println("POST Login request!");
+
+    authenticate(username, password);
+    UserDetails userDetails = secureUserService.loadUserByUsername(username);
+    String token = jwtTokenUtil.generateToken(userDetails);
+
+    return ResponseEntity.ok(token);
+  }
+
+  @RequestMapping(value = "/test", method = RequestMethod.GET)
+  public ResponseEntity<?> test()  {
+    getCurrentUser();
+    return ResponseEntity.ok("ok");
+  }
+
+
 
   /**
    * @api {post} /register User register
@@ -188,7 +219,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   private User getCurrentUser() {
     UserDetails ud =  (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     User u = userService.getUser(ud.getUsername());
-    //System.out.println("Hi, I'm " + u.getUsername());
+    System.out.println("Hi, I'm " + u.getUsername());
     return userService.getUser(ud.getUsername());
   }
 
@@ -202,4 +233,13 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public String getErrorPath() {
     return null;
   }
+
+  private void authenticate(String username, String password) throws Exception {
+    try {
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+    } catch (BadCredentialsException e) {
+      throw new Exception("INVALID_CREDENTIALS", e);
+    }
+  }
+
 }

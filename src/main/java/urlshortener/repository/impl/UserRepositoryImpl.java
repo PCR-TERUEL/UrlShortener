@@ -65,15 +65,24 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public User login(User u) {
-    User fullUser =  jdbc.query("SELECT * FROM user WHERE USERNAME = ? AND PASSWORD = ?",
-            new Object[] {u.getUsername(), u.getPassword()}, rowMapper).get(0);
-    return fullUser;
+    List<User> users =  jdbc.query("SELECT * FROM user WHERE USERNAME = ? AND PASSWORD = ?",
+            new Object[] {u.getUsername(), u.getPassword()}, rowMapper);
+
+    if (!users.isEmpty()) {
+      return users.get(0);
+    }
+
+    return null;
   }
 
   @Override
   public User getUser(String username) {
-    User u = jdbc.query("SELECT * FROM user WHERE USERNAME = ?", new Object[] {username}, rowMapper).get(0);
-    return u;
+    try {
+      return jdbc.query("SELECT * FROM user WHERE USERNAME = ?", new Object[] {username}, rowMapper).get(0);
+    } catch (Exception e) {
+      return null;
+    }
+
   }
 
   @Override
