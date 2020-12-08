@@ -5,6 +5,8 @@ import urlshortener.domain.Role;
 import urlshortener.domain.User;
 import urlshortener.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -40,4 +42,8 @@ public class UserService {
     public boolean exists(String userId) {
       return userRepository.exists(userId);
     }
+
+  public List<User> getUsers() {
+    return userRepository.getUsers();
+  }
 }

@@ -1,6 +1,7 @@
 package urlshortener.web;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,7 +77,7 @@ public class UrlShortenerController implements WebMvcConfigurer {
   }
 
   /**
-   * @api {post} /register User register
+   * @api {post} /signup User signup
    * @apiName User register
    * @apiGroup User
    *
@@ -88,7 +89,7 @@ public class UrlShortenerController implements WebMvcConfigurer {
    * @apiError 226 Username already exists.
    */
 
-  @RequestMapping(value = "/register", method = RequestMethod.POST)
+  @RequestMapping(value = "/signup", method = RequestMethod.POST)
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
     if(username.equals("") || password.equals("")){
@@ -138,6 +139,30 @@ public class UrlShortenerController implements WebMvcConfigurer {
       return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
     }
   }
+
+  /**
+   * @api {get} /login User login
+   * @apiName User login
+   * @apiGroup User
+   *
+   * @apiParam {String} username Username.
+   * @apiParam {String} password Password.
+   *
+   * @apiSuccess 202 User login successful.
+   * @apiError  400 Bad user parameters.
+   * @apiError 203 Wrong user or password.
+   */
+
+  @RequestMapping(value = "/user-information", method = RequestMethod.GET)
+  public ResponseEntity<?> getUsers() {
+
+    List<User> users = userService.getUsers();
+
+    return new ResponseEntity<>(users, HttpStatus.ACCEPTED);
+
+  }
+
+
 
   /**
    * @api {post} /link Create short link

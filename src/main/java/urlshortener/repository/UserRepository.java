@@ -18,5 +18,7 @@ public interface UserRepository {
 
   User getUser(String username);
 
+  List<User> getUsers();
+
   boolean exists(String userId);
 }

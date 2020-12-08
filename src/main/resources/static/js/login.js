@@ -45,7 +45,7 @@ $(document).ready(function () {
         if(validateRegisterFields($("#register-username"), $("#register-password"), $("#register-confirm-password"))){
             $.ajax({
                 type: "POST",
-                url: URL_SERVER + "/register",
+                url: URL_SERVER + "/signup",
                 data: {username: $("#register-username").val(), password: $("#register-password").val()},
                 success: function (msg, statusText, xhr) {
                     if (xhr.status === 201) {
