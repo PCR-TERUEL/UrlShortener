@@ -55,7 +55,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
-        .antMatchers("/panel").hasRole("USER")
+        .antMatchers("/panel", "/logout").hasRole("USER")
         .and()
         .authorizeRequests().antMatchers("/delete").hasRole("ADMIN")
         .and()

@@ -27,16 +27,6 @@ public class UserService {
     return userRepository.save(u);
   }
 
-  public User login(String username, String password) {
-    System.out.println("Llego aquí?????");
-    User u = UserBuilder.newInstance()
-            .username(username)
-            .password(password)
-            .build();
-
-    System.out.println("Llego aquí?????");
-    return userRepository.login(u);
-  }
 
   public User getUser(String username) {
     return userRepository.getUser(username);

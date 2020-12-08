@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -55,8 +56,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     this.userService = userService;
     this.secureUserService = secureUserService;
   }
-
-
 
   /**
    * @api {get} /{id:(?!link|index).*} Shortened url
@@ -98,10 +97,19 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return "userlogin";
   }
 
-  @RequestMapping(value = "/test", method = RequestMethod.GET)
-  public ResponseEntity<?> test()  {
-    getCurrentUser();
-    return ResponseEntity.ok("ok");
+  @RequestMapping(value = "/logout", method = RequestMethod.GET)
+  public String logout (HttpServletRequest request, HttpServletResponse response) {
+    System.out.println("Llego siquiera?");
+    Cookie c = new Cookie("token", null);
+    c.setMaxAge(0);
+    response.addCookie(c);
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null){
+      new SecurityContextLogoutHandler().logout(request, response, auth);
+    }
+
+    return "redirect:/index";
   }
 
   @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -114,10 +122,10 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     UserDetails userDetails = secureUserService.loadUserByUsername(username);
     String token = jwtTokenUtil.generateToken(userDetails);
     response.addCookie(new Cookie("token", "Bearer " + token));
+    response.addCookie(new Cookie("username", username));
 
     return ResponseEntity.ok(new JWT(token));
   }
-
 
   /**
    * @api {post} /register User register
