@@ -15,12 +15,10 @@ import java.util.List;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-  private static final Logger log = LoggerFactory
-      .getLogger(UserRepositoryImpl.class);
-
   private static final RowMapper<User> rowMapper =
     (rs, rowNum) -> new User(rs.getString("id"), rs.getString("username"),
             rs.getString("password"), rs.getInt("role"));
+
   private final JdbcTemplate jdbc;
 
   public UserRepositoryImpl(JdbcTemplate jdbc) {
@@ -33,22 +31,19 @@ public class UserRepositoryImpl implements UserRepository {
       jdbc.update("INSERT INTO USER(USERNAME, PASSWORD, ROLE) VALUES (?,?,?)",
               u.getUsername(), u.getPassword(), 1);
       return true;
-    } catch (DuplicateKeyException e) {
-      log.debug("When insert for key {}", u.getUsername(), e);
-    } catch (Exception e) {
+    }  catch (Exception e) {
       System.out.println(e);
     }
-    System.out.print("Cosa mala...");
+
     return false;
   }
-
 
   @Override
   public Long count() {
     try {
       return jdbc.queryForObject("select count(*) from click", Long.class);
     } catch (Exception e) {
-      log.debug("When counting", e);
+      System.out.println(e);
     }
     return -1L;
   }
@@ -58,22 +53,9 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       return jdbc.query("SELECT * FROM user LIMIT ? OFFSET ?", new Object[] {limit, offset}, rowMapper);
     } catch (Exception e) {
-      log.debug("When select for limit " + limit + " and offset "
-          + offset, e);
+      System.out.println();
       return Collections.emptyList();
     }
-  }
-
-  @Override
-  public User login(User u) {
-    List<User> users =  jdbc.query("SELECT * FROM user WHERE USERNAME = ? AND PASSWORD = ?",
-            new Object[] {u.getUsername(), u.getPassword()}, rowMapper);
-
-    if (!users.isEmpty()) {
-      return users.get(0);
-    }
-
-    return null;
   }
 
   @Override

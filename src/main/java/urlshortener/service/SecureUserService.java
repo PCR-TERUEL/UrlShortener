@@ -1,6 +1,5 @@
 package urlshortener.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,13 +8,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 import urlshortener.domain.Role;
+import urlshortener.repository.UserRepository;
 
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class SecureUserService implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
@@ -23,7 +23,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Hello, Spring Security! with username: " + username);
-        urlshortener.domain.User user = userService.getUser(username);
+        urlshortener.domain.User user = userRepository.getUser(username);
         System.out.println("Received user details from database: " + user.getUsername() + ":" + user.getPassword() +":" + user.getRoleId());
 
         if (user != null) {
@@ -47,7 +47,21 @@ public class MyUserDetailsService implements UserDetailsService {
         } else {
             return "USER";
         }
+    }
 
+    public boolean save(String username, String password) {
+        urlshortener.domain.User u = SecureUserBuilder.newInstance()
+                .id("-1")
+                .username(username)
+                .password(password)
+                .roleId(Role.ROLE_USER)
+                .build();
+
+        return userRepository.save(u);
+    }
+
+    public urlshortener.domain.User getUser(String username) {
+        return userRepository.getUser(username);
     }
 
 }

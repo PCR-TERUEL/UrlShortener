@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
-import urlshortener.service.MyUserDetailsService;
+import urlshortener.service.SecureUserService;
 
 @Component
 public class JWTRequestFilter extends OncePerRequestFilter {
@@ -26,7 +26,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     private static final String TOKEN_COOKIE_PARAM = "token";
 
     @Autowired
-    private MyUserDetailsService jwtUserDetailsService;
+    private SecureUserService jwtUserDetailsService;
 
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
@@ -35,14 +35,11 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwtToken = getRequestToken(request);
 
         if (jwtToken != null) {
             try {
-                System.out.println("JWT: Received token: " + jwtToken);
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
                 System.out.println("JWT: Unable to get JWT Token");
@@ -63,7 +60,6 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
         if (token == null && request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                System.out.println(cookie.getName());
                 if(cookie.getName().equals(TOKEN_COOKIE_PARAM)) {
                     token = cookie.getValue();
                 }
@@ -71,7 +67,6 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         }
 
         if (token != null && token.startsWith("Bearer ")) {
-            System.out.println("JWT: Got user token: " + token);
             return token.substring(7);
         }
 
@@ -82,7 +77,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 
-            // if token is valid configure Spring Security to manually set authentication
+            // If token is valid configure Spring Security to manually set authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

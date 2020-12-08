@@ -15,7 +15,6 @@ import static urlshortener.fixtures.ShortURLFixture.someUrl;
 
 import java.net.URI;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.junit.Before;
@@ -30,8 +29,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.ClickService;
+import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
-import urlshortener.service.UserService;
 
 public class UrlShortenerTests {
 
@@ -44,7 +43,7 @@ public class UrlShortenerTests {
   private ShortURLService shortUrlService;
 
   @Mock
-  private UserService userService;
+  private SecureUserService userService;
 
   @InjectMocks
   private UrlShortenerController urlShortener;

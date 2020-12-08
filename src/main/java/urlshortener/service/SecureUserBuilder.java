@@ -2,14 +2,14 @@ package urlshortener.service;
 
 import urlshortener.domain.User;
 
-public class UserBuilder {
+public class SecureUserBuilder {
   private String id;
   private String username;
   private String password;
   private int roleId;
 
-  static UserBuilder newInstance() {
-    return new UserBuilder();
+  static SecureUserBuilder newInstance() {
+    return new SecureUserBuilder();
   }
 
   User build() {
@@ -21,22 +21,22 @@ public class UserBuilder {
     );
   }
 
-  UserBuilder id(String id) {
+  SecureUserBuilder id(String id) {
     this.id = id;
     return this;
   }
 
-  UserBuilder username(String username) {
+  SecureUserBuilder username(String username) {
     this.username = username;
     return this;
   }
 
-  UserBuilder password(String password) {
+  SecureUserBuilder password(String password) {
     this.password = password;
     return this;
   }
 
-  UserBuilder roleId(int roleId) {
+  SecureUserBuilder roleId(int roleId) {
     this.roleId = roleId;
     return this;
   }

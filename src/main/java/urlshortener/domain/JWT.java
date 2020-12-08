@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 public class JWT implements Serializable {
     private String token;
-
     public JWT(String token) {
         this.token = token;
     }

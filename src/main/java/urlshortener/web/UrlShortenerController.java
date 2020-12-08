@@ -1,8 +1,6 @@
 package urlshortener.web;
 
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,12 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.view.RedirectView;
 import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
@@ -36,12 +30,9 @@ import urlshortener.service.*;
 @Controller
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
   public static final String HOST = "localhost:8080";
-  private static final String STATUS_OK = "OK";
-  private static final String STATUS_ERROR = "ERROR";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
-  private final MyUserDetailsService secureUserService;
-  private final UserService userService;
+  private final SecureUserService secureUserService;
 
   @Autowired
   private AuthenticationManager authenticationManager;
@@ -49,11 +40,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @Autowired
   private JWTTokenUtil jwtTokenUtil;
 
-  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService,
-                                MyUserDetailsService secureUserService) {
+  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService secureUserService) {
     this.shortUrlService = shortUrlService;
     this.clickService = clickService;
-    this.userService = userService;
     this.secureUserService = secureUserService;
   }
 
@@ -116,7 +105,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
                                                      @RequestParam String password,
                                                      HttpServletResponse response) throws Exception {
-    System.out.println("POST Login request!");
 
     authenticate(username, password);
     UserDetails userDetails = secureUserService.loadUserByUsername(username);
@@ -143,12 +131,12 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @RequestMapping(value = "/singup", method = RequestMethod.POST)
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
-    System.out.println("POST Singup request: " + username +":" +password);
+
     if(username.equals("") || password.equals("")){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    boolean registered = userService.save(username, password);
+    boolean registered = secureUserService.save(username, password);
 
     if (registered) {
       return new ResponseEntity<>(HttpStatus.CREATED);
@@ -184,11 +172,8 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
                                             HttpServletRequest request) {
 
     User u = getCurrentUser();
-
     URLValidatorService urlValidator = new URLValidatorService(url);
-    if(!userService.exists(String.valueOf(u.getId()))) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
+
     if (urlValidator.isValid()) {
       ShortURL su = shortUrlService.save(url, sponsor, String.valueOf(u.getId()), request.getRemoteAddr());
       HttpHeaders h = new HttpHeaders();
@@ -217,9 +202,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) {
     User u = getCurrentUser();
 
-    if(!userService.exists(String.valueOf(u.getId()))) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
     JSONObject urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
     System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
 
@@ -250,9 +232,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   private User getCurrentUser() {
     UserDetails ud =  (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User u = userService.getUser(ud.getUsername());
-    System.out.println("Hi, I'm " + u.getUsername());
-    return userService.getUser(ud.getUsername());
+    return secureUserService.getUser(ud.getUsername());
   }
 
   private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
