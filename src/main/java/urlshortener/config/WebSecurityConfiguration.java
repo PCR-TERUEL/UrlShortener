@@ -4,9 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import urlshortener.service.SecureUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import javax.servlet.http.Cookie;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +59,15 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**",
         "/css/**", "/img/**", "/js/**", "/lib/**", "/images").permitAll().anyRequest().authenticated()
         .and()
+        .logout().addLogoutHandler(((request, response, auth) -> {
+            for (Cookie cookie : request.getCookies()) {
+                String cookieName = cookie.getName();
+                Cookie cookieToDelete = new Cookie(cookieName, null);
+                cookieToDelete.setMaxAge(0);
+                response.addCookie(cookieToDelete);
+            }
+        })).logoutUrl("/logout").logoutSuccessUrl("/")
+        .and()
         .exceptionHandling().accessDeniedPage("/login?=unauthorized")
         .and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -66,5 +79,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 
 }
