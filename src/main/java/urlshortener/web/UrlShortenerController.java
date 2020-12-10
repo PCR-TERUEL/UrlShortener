@@ -86,26 +86,12 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return "userlogin";
   }
 
-  @RequestMapping(value = "/logout", method = RequestMethod.GET)
-  public String logout (HttpServletRequest request, HttpServletResponse response) {
-    System.out.println("Llego siquiera?");
-    Cookie c = new Cookie("token", null);
-    c.setMaxAge(0);
-    response.addCookie(c);
-
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth != null){
-      new SecurityContextLogoutHandler().logout(request, response, auth);
-    }
-
-    return "redirect:/index";
-  }
-
   @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
   public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
                                                      @RequestParam String password,
                                                      HttpServletResponse response) throws Exception {
 
+    System.out.println("Hey, " + username + " " + password);
     authenticate(username, password);
     UserDetails userDetails = secureUserService.loadUserByUsername(username);
     String token = jwtTokenUtil.generateToken(userDetails);
@@ -171,7 +157,8 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
                                      @RequestParam(value = "sponsor", required = false) String sponsor,
                                             HttpServletRequest request) {
 
-    User u = getCurrentUser();
+    String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
+    User u = secureUserService.getUser(username);
     URLValidatorService urlValidator = new URLValidatorService(url);
 
     if (urlValidator.isValid()) {
@@ -200,7 +187,8 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) {
-    User u = getCurrentUser();
+    String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
+    User u = secureUserService.getUser(username);
 
     JSONObject urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
     System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
@@ -230,11 +218,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return jsonResponse;
   }
 
-  private User getCurrentUser() {
-    UserDetails ud =  (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    return secureUserService.getUser(ud.getUsername());
-  }
-
   private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
     HttpHeaders h = new HttpHeaders();
     h.setLocation(URI.create(l.getTarget()));
@@ -253,5 +236,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       throw new Exception("INVALID_CREDENTIALS", e);
     }
   }
+
+
 
 }

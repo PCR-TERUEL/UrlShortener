@@ -13,8 +13,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 @Component
 public class JWTTokenUtil implements Serializable {
+
+    private static final String TOKEN_HEADER_PARAM = "Authorization";
+    private static final String TOKEN_COOKIE_PARAM = "token";
 
     private static final long serialVersionUID = -2550185165626007488L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
@@ -68,5 +74,23 @@ public class JWTTokenUtil implements Serializable {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String getRequestToken(HttpServletRequest request) {
+        String token = request.getHeader(TOKEN_HEADER_PARAM);
+
+        if (token == null && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if(cookie.getName().equals(TOKEN_COOKIE_PARAM)) {
+                    token = cookie.getValue();
+                }
+            }
+        }
+
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+
+        return null;
     }
 }

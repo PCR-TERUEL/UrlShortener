@@ -27,5 +27,4 @@ public class Role {
     public void setId(int id) {
         this.id = id;
     }
-
 }

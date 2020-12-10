@@ -22,8 +22,7 @@ import urlshortener.service.SecureUserService;
 
 @Component
 public class JWTRequestFilter extends OncePerRequestFilter {
-    private static final String TOKEN_HEADER_PARAM = "Authorization";
-    private static final String TOKEN_COOKIE_PARAM = "token";
+
 
     @Autowired
     private SecureUserService jwtUserDetailsService;
@@ -36,7 +35,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String username = null;
-        String jwtToken = getRequestToken(request);
+        String jwtToken = jwtTokenUtil.getRequestToken(request);
 
         if (jwtToken != null) {
             try {
@@ -55,23 +54,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     }
 
 
-    private String getRequestToken(HttpServletRequest request) {
-        String token = request.getHeader(TOKEN_HEADER_PARAM);
 
-        if (token == null && request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if(cookie.getName().equals(TOKEN_COOKIE_PARAM)) {
-                    token = cookie.getValue();
-                }
-            }
-        }
-
-        if (token != null && token.startsWith("Bearer ")) {
-            return token.substring(7);
-        }
-
-        return null;
-    }
 
     private void validateToken(String username, String jwtToken, HttpServletRequest request) {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
