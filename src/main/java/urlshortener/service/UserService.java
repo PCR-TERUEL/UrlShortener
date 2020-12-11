@@ -43,6 +43,14 @@ public class UserService {
       return userRepository.exists(userId);
     }
 
+    public List<User> getUsers() {
+      return userRepository.getUsers();
+    }
+
+  public boolean deleteUser(int userId) {
+    return userRepository.deleteById(userId);
+  }
+
   public List<User> getUsers() {
     return userRepository.getUsers();
   }*/

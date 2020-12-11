@@ -82,4 +82,8 @@ public class ShortURLService {
 
     return shortURLRepository.save(su);
   }
+
+  public boolean isValidated(String id) {
+    return findByKey(id) != null && findByKey(id).isValidated();
+  }
 }

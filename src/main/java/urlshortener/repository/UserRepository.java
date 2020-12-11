@@ -15,4 +15,8 @@ public interface UserRepository {
   List<User> getUsers();
 
   boolean exists(String userId);
+
+  List<User> getUsers();
+
+  boolean deleteById(int userId);
 }

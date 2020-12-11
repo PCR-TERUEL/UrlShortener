@@ -79,5 +79,13 @@ public class UserRepositoryImpl implements UserRepository {
     return listUsers.size() > 0;
   }
 
+  @Override
+  public List<User> getUsers() {
+    return jdbc.query("SELECT * FROM USER", rowMapper);
+  }
 
+  @Override
+  public boolean deleteById(int userId) {
+    return jdbc.update("DELETE FROM USER WHERE ID = ?", userId) == 1;
+  }
 }

@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+
 import javax.servlet.http.HttpServletResponse;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.JWT;
@@ -36,6 +39,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public static final String HOST = "localhost:8080";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
+  private final UserService userService;
+  private final TaskQueueService taskQueueService;
+  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService, TaskQueueService taskQueueService) {
   private final SecureUserService secureUserService;
 
   @Autowired
@@ -47,6 +53,23 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService secureUserService) {
     this.shortUrlService = shortUrlService;
     this.clickService = clickService;
+    this.userService = userService;
+    this.taskQueueService = taskQueueService;
+  }
+
+  @RequestMapping(value = "/test", method = RequestMethod.POST)
+  public ResponseEntity<?> test() {
+    taskQueueService.send("one");
+    taskQueueService.send("two");
+    taskQueueService.send("tree");
+    taskQueueService.send("caramba");
+    return null;
+  }
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/static/**")
+            .addResourceLocations("classpath:/static");
     this.secureUserService = secureUserService;
   }
 
@@ -69,7 +92,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       ShortURL l = shortUrlService.findByKey(id);
       shortUrlService.delete(l.getHash());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
+    } else if (!shortUrlService.isValidated(id)) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }else{
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
@@ -190,12 +215,22 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
     if (urlValidator.isValid()) {
       ShortURL su = shortUrlService.save(url, sponsor, String.valueOf(u.getId()), request.getRemoteAddr());
+    /* if(!userService.exists(userId)){
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }*/
+    TaskQueueService tqs = null;
+
+    /*TODO INSERT CODE TO QUEUE THE VALIDATION TASKS
+
+      if (urlValidator.isValid()) {
+      } else {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }*/
+      ShortURL su = shortUrlService.save(url, sponsor, userId, request.getRemoteAddr());
       HttpHeaders h = new HttpHeaders();
       h.setLocation(su.getUri());
       return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-    } else {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
+
   }
 
   /**
@@ -229,6 +264,40 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @RequestMapping("/error")
   public String error() {
     return "error_no";
+  }
+
+
+  /**
+   * @api {get} /users-information Get users information
+   * @apiName Get user intormation
+   * @apiGroup User
+   *
+   * @apiSuccess 201 Link generated successfully.
+   * @apiError  401 User does not exists.
+   * @apiError 400 Invalid or unreachable URL.
+   */
+
+  @RequestMapping(value = "/users-information", method = RequestMethod.GET)
+  public ResponseEntity<?> getUsers() {
+    return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+  }
+
+  /**
+   * @api {get} /user/{id} Delete a user
+   * @apiName Delete a user
+   * @apiGroup User
+   *
+   * @apiSuccess 201 User deleted successfully.
+   * @apiError  401 User does not exists.
+   * @apiError 400 Invalid or unreachable URL.
+   */
+
+  @DeleteMapping(value = "/user/{id}")
+  public ResponseEntity<?> deleteUser(@PathVariable int id) {
+    if (userService.deleteUser(id)){
+      return new ResponseEntity<>(HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   private String extractIP(HttpServletRequest request) {

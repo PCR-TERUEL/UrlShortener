@@ -244,7 +244,7 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/register",
+    "url": "/signup",
     "title": "User register",
     "name": "User_register",
     "group": "User",
