@@ -1,11 +1,9 @@
 package urlshortener.web;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 import java.net.URISyntaxException;
 import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import urlshortener.config.JWTTokenUtil;
@@ -39,9 +36,14 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public static final String HOST = "localhost:8080";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
-  private final UserService userService;
   private final TaskQueueService taskQueueService;
-  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, UserService userService, TaskQueueService taskQueueService) {
+
+  /*public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService userService, TaskQueueService taskQueueService) {
+    this.shortUrlService = shortUrlService;
+    this.clickService = clickService;
+    this.userService = userService;
+    this.taskQueueService = taskQueueService;
+  }*/
   private final SecureUserService secureUserService;
 
   @Autowired
@@ -50,10 +52,10 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @Autowired
   private JWTTokenUtil jwtTokenUtil;
 
-  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService secureUserService) {
+  public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService secureUserService, TaskQueueService taskQueueService) {
     this.shortUrlService = shortUrlService;
     this.clickService = clickService;
-    this.userService = userService;
+    this.secureUserService = secureUserService;
     this.taskQueueService = taskQueueService;
   }
 
@@ -70,7 +72,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/static/**")
             .addResourceLocations("classpath:/static");
-    this.secureUserService = secureUserService;
+    //this.secureUserService = secureUserService;
   }
 
   /**
@@ -165,74 +167,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   }
 
 
-
-  /**
-   * @api {get} /login User login
-   * @apiName User login
-   * @apiGroup User
-   *
-   * @apiParam {String} username Username.
-   * @apiParam {String} password Password.
-   *
-   * @apiSuccess 202 User login successful.
-   * @apiError  400 Bad user parameters.
-   * @apiError 203 Wrong user or password.
-   */
-
-  @RequestMapping(value = "/user-information", method = RequestMethod.GET)
-  public ResponseEntity<?> getUsers() {
-
-    List<User> users = secureUserService.getUsers();
-
-    return new ResponseEntity<>(users, HttpStatus.ACCEPTED);
-
-  }
-
-
-
-  /**
-   * @api {post} /link Create short link
-   * @apiName Create short link
-   * @apiGroup ShortURL
-   *
-   * @apiParam {String} url URL you want to short.
-   * @apiParam {String} sponsor="sponsor" Sponsor.
-   * @apiParam {String} uuid User Id.
-   *
-   * @apiSuccess 201 Link generated successfully.
-   * @apiError  401 User does not exists.
-   * @apiError 400 Invalid or unreachable URL.
-   */
-
-  @RequestMapping(value = "/link", method = RequestMethod.POST)
-  public ResponseEntity<?> shortener(@RequestParam("url") String url,
-                                     @RequestParam(value = "sponsor", required = false) String sponsor,
-                                            HttpServletRequest request) {
-
-    String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
-    User u = secureUserService.getUser(username);
-    URLValidatorService urlValidator = new URLValidatorService(url);
-
-    if (urlValidator.isValid()) {
-      ShortURL su = shortUrlService.save(url, sponsor, String.valueOf(u.getId()), request.getRemoteAddr());
-    /* if(!userService.exists(userId)){
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }*/
-    TaskQueueService tqs = null;
-
-    /*TODO INSERT CODE TO QUEUE THE VALIDATION TASKS
-
-      if (urlValidator.isValid()) {
-      } else {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-      }*/
-      ShortURL su = shortUrlService.save(url, sponsor, userId, request.getRemoteAddr());
-      HttpHeaders h = new HttpHeaders();
-      h.setLocation(su.getUri());
-      return new ResponseEntity<>(su, h, HttpStatus.CREATED);
-
-  }
-
   /**
    * @api {post} /link Get user links
    * @apiName Get user links
@@ -279,7 +213,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @RequestMapping(value = "/users-information", method = RequestMethod.GET)
   public ResponseEntity<?> getUsers() {
-    return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+    return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
   }
 
   /**
@@ -294,7 +228,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @DeleteMapping(value = "/user/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable int id) {
-    if (userService.deleteUser(id)){
+    if (secureUserService.deleteUser(id)){
       return new ResponseEntity<>(HttpStatus.OK);
     }
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

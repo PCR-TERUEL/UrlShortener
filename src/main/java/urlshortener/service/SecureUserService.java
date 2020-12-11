@@ -26,7 +26,7 @@ public class SecureUserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Hello, Spring Security! with username: " + username);
         urlshortener.domain.User user = userRepository.getUser(username);
-        System.out.println("Received user details from database: " + user.getUsername() + ":" + user.getPassword() +":" + user.getRoleId());
+        System.out.println("Received user details from database: " + user.getUsername() + ":" + user.getPassword() + ":" + user.getRoleId());
 
         if (user != null) {
             return User.builder()
@@ -43,7 +43,7 @@ public class SecureUserService implements UserDetailsService {
         }
     }
 
-    private String getRoleName( urlshortener.domain.User u) {
+    private String getRoleName(urlshortener.domain.User u) {
         if (u.getRoleId() == Role.ROLE_ADMIN) {
             return "ADMIN";
         } else {
@@ -65,7 +65,12 @@ public class SecureUserService implements UserDetailsService {
     public urlshortener.domain.User getUser(String username) {
         return userRepository.getUser(username);
     }
+
     public List<urlshortener.domain.User> getUsers() {
         return userRepository.getUsers();
+    }
+
+    public boolean deleteUser(int id) {
+        return userRepository.deleteById(id);
     }
 }
