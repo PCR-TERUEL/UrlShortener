@@ -1,8 +1,8 @@
-# Web Engineering 2020-2021 / URL Shortener
+# Acorta
 
 [![Build Status](https://travis-ci.com/UNIZAR-30246-WebEngineering/UrlShortener.svg?branch=master)](https://travis-ci.com/UNIZAR-30246-WebEngineering/UrlShortener)
 
-This is the start repository for the project developed in this course. 
+A UrlShortner fork.
 
 The __project__ is a [Spring Boot](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/) application that offers a minimum set of functionalities shared by all subprojects.
 

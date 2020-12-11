@@ -10,6 +10,8 @@ import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 import urlshortener.web.UrlShortenerController;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Service
@@ -25,9 +27,13 @@ public class ShortURLService {
     return shortURLRepository.findByKey(id);
   }
 
-  public JSONObject findByUser(String userId) {
+  public List<ShortURL> findByUser(String userId) throws URISyntaxException {
+    List<ShortURL> shortURLS = shortURLRepository.findByUser(userId);
+    for (ShortURL shortURL : shortURLS) {
+      shortURL.setUri(new URI(UrlShortenerController.HOST + "/r/" + shortURL.getHash()));
+    }
 
-     return toJson(shortURLRepository.findByUser(userId));
+     return shortURLRepository.findByUser(userId);
   }
 
   private JSONObject toJson(List<ShortURL> shortList) {
@@ -39,7 +45,7 @@ public class ShortURLService {
       for (ShortURL su : shortList)
       {
         JSONObject shortJSON = new JSONObject();
-        shortJSON.put( "uri", "http://" + UrlShortenerController.HOST + "/" + su.getHash());
+        shortJSON.put( "uri", "http://" + UrlShortenerController.HOST + "/r/" + su.getHash());
         shortJSON.put("target", su.getTarget());
         shortJSON.put("clicks", su.getClicks());
         jArray.add(shortJSON);
@@ -61,6 +67,7 @@ public class ShortURLService {
   }
 
   public ShortURL save(String url, String sponsor, String owner, String ip) {
+
     ShortURL su = ShortURLBuilder.newInstance()
         .target(url)
         .uri((String hash) -> linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri())
@@ -72,6 +79,7 @@ public class ShortURLService {
         .ip(ip)
         .unknownCountry()
         .build();
+
     return shortURLRepository.save(su);
   }
 }

@@ -5,29 +5,15 @@ var num_pending_request = 10;
 var num_processed_lines = 0;
 var retval = "";
 
+var stompClient = null;
+
 $(document).ready(function () {
     $("#username-header").html(getCookie("username"));
     getData();
+    connect();
     $(".btn-get-started").click(function () {
-        $.ajax({
-            type: "POST",
-            url: URL_SERVER + "/link",
-            data: {url: $("#id-url-input").val(), uuid: getCookie("uuid")},
-            success: function (msg) {
-                msg.clicks = 0;
-                appendRow(msg);
-                $('html, body').animate({
-                    scrollTop: $("#about").offset().top
-                }, 2000);
-
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR.status)
-                if (jqXHR.status === 400) {
-                    $("#feedback").html("No se puede recortar esa url");
-                }
-            }
-        });
+        stompClient.send("/app/link", {}, JSON.stringify({url: $("#id-url-input").val(),
+            idToken: getCookie("token")}));
     });
 
     $(function(){
@@ -54,7 +40,22 @@ $(document).ready(function () {
     });
 });
 
+
+function connect() {
+    alert("INTENTO CONECTAR");
+
+    var socket = new SockJS('http://localhost:8080/short_url');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.info('Connected: ' + frame);
+        stompClient.subscribe('/url_shortener/short_url', function (response) {
+            appendRow(JSON.parse(response.body));
+        });
+    });
+}
+
 function appendRow(msg){
+    alert(msg.error);
     var markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
         "<td><a href=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
     var tableBody = $("tbody");
@@ -67,7 +68,7 @@ function getShortURLFromCSV() {
     $.ajax({
         type: "POST",
         url: URL_SERVER + "/link",
-        data: {url: lines[num_processed_lines] , uuid: getCookie("uuid")},
+        data: {url: lines[num_processed_lines]},
         success: function (msg) {
             num_processed_lines ++;
             console.log(num_processed_lines + "  " + msg.uri);
@@ -111,7 +112,6 @@ function getData(){
     $.ajax({
         type: "POST",
         url: URL_SERVER + "/userlinks",
-        data: {uuid:getCookie("uuid")},
         success: function (msg) {
             links = msg.urlList;
             for(var i = 0; i < links.length; i ++){

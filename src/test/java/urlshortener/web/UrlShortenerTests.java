@@ -1,8 +1,8 @@
 package urlshortener.web;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,14 +23,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.ClickService;
+import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
-import urlshortener.service.UserService;
 
 public class UrlShortenerTests {
 
@@ -43,10 +50,13 @@ public class UrlShortenerTests {
   private ShortURLService shortUrlService;
 
   @Mock
-  private UserService userService;
+  private SecureUserService userService;
 
   @InjectMocks
   private UrlShortenerController urlShortener;
+
+  @Autowired
+  private UrlShortenerController urlShortenerController;
 
   @Before
   public void setup() {
@@ -56,15 +66,27 @@ public class UrlShortenerTests {
 
   @Test
   public void thatRegisterIsSuccessful() throws Exception {
-    configureUserSave("testUserxxx", "testPassword");
+    configureUserSave("user", "1234");
 
-    mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON)
-            .param("username","testUserxxx")
-            .param("password","testPassword"))
+    mockMvc.perform(post("/singup").contentType(MediaType.APPLICATION_JSON)
+            .param("username","user")
+            .param("password","1234"))
             .andDo(print())
             .andExpect(status().isCreated());
   }
 
+  @Test
+  public void thatAuthenticationIsSuccessful() throws Exception {
+    MvcResult result = mockMvc.perform(post("/authenticate").contentType(MediaType.APPLICATION_JSON)
+            .param("username","user")
+            .param("password","1234"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("token", is(notNullValue()))).andReturn();
+
+    System.out.println(result.getResponse().getContentAsString());
+
+  }
 
   @Test
   public void thatShortenerCreatesARedirectIfTheURLisOK() throws Exception {
@@ -169,7 +191,7 @@ public class UrlShortenerTests {
 
   private void configureUserSave(String username, String password) {
     when(userService.save(any(),  any()))
-            .then((Answer<User>) invocation -> new User(username, password));
+            .then((Answer<Boolean>) invocation -> true);
   }
 
 
