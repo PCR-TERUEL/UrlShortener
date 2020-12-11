@@ -10,6 +10,8 @@ import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 import urlshortener.web.UrlShortenerController;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Service
@@ -25,9 +27,13 @@ public class ShortURLService {
     return shortURLRepository.findByKey(id);
   }
 
-  public JSONObject findByUser(String userId) {
+  public List<ShortURL> findByUser(String userId) throws URISyntaxException {
+    List<ShortURL> shortURLS = shortURLRepository.findByUser(userId);
+    for (ShortURL shortURL : shortURLS) {
+      shortURL.setUri(new URI(UrlShortenerController.HOST + "/r/" + shortURL.getHash()));
+    }
 
-     return toJson(shortURLRepository.findByUser(userId));
+     return shortURLRepository.findByUser(userId);
   }
 
   private JSONObject toJson(List<ShortURL> shortList) {

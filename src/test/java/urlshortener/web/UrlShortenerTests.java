@@ -55,7 +55,7 @@ public class UrlShortenerTests {
   @InjectMocks
   private UrlShortenerController urlShortener;
 
-  @Autowired // import through Spring
+  @Autowired
   private UrlShortenerController urlShortenerController;
 
   @Before

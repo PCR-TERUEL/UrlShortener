@@ -2,6 +2,8 @@ package urlshortener.web;
 
 import java.net.URI;
 
+import java.net.URISyntaxException;
+import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -188,11 +189,11 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @Async
   @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
-  public ResponseEntity<?> getUserLinks(HttpServletRequest request) {
+  public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
     String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
     User u = secureUserService.getUser(username);
 
-    JSONObject urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
+    List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
     System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
 
     return new ResponseEntity<>(urlShort, HttpStatus.OK);
