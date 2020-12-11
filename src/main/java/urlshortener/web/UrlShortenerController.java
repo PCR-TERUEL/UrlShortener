@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -185,6 +186,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
    * @apiError 400 Invalid or unreachable URL.
    */
 
+  @Async
   @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) {
     String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
@@ -194,7 +196,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
 
     return new ResponseEntity<>(urlShort, HttpStatus.OK);
-
   }
 
 

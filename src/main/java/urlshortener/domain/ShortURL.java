@@ -32,7 +32,7 @@ public class ShortURL {
     this.safe = safe;
     this.ip = ip;
     this.country = country;
-
+    this.clicks = 0L;
   }
 
   public ShortURL() {
