@@ -55,6 +55,9 @@ public class UrlShortenerTests {
   @InjectMocks
   private UrlShortenerController urlShortener;
 
+  @Autowired // import through Spring
+  private UrlShortenerController urlShortenerController;
+
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
@@ -74,9 +77,6 @@ public class UrlShortenerTests {
 
   @Test
   public void thatAuthenticationIsSuccessful() throws Exception {
-    SecurityContextHolderAwareRequestFilter securityContextHolderAwareRequestFilter = new SecurityContextHolderAwareRequestFilter();
-    securityContextHolderAwareRequestFilter.afterPropertiesSet();
-
     MvcResult result = mockMvc.perform(post("/authenticate").contentType(MediaType.APPLICATION_JSON)
             .param("username","user")
             .param("password","1234"))
