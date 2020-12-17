@@ -1,7 +1,5 @@
 # Acorta
 
-[![Build Status](https://travis-ci.com/UNIZAR-30246-WebEngineering/UrlShortener.svg?branch=master)](https://travis-ci.com/UNIZAR-30246-WebEngineering/UrlShortener)
-
 A UrlShortner fork.
 
 The __project__ is a [Spring Boot](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/) application that offers a minimum set of functionalities shared by all subprojects.
@@ -10,6 +8,12 @@ The __project__ is a [Spring Boot](http://docs.spring.io/spring-boot/docs/curren
 * __Redirection service__: `GET /{id}` redirects the request to a URL associated with the parameter `id`.
 * __Database service__: Persistence and retrieval of `ShortURL` and `Click` objects.
 
+
+This project depends on the urls validation repository:
+https://github.com/PCR-TERUEL/ValidationWorker 
+
+Link of the cross evaluation presentation:
+https://drive.google.com/file/d/17YJY08EA7NOGW3jRSfDC04LGhFVt6mm1/view?usp=sharing 
 
 The application can be run in Linux and macOS as follows:
 
