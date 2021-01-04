@@ -2,7 +2,6 @@ package urlshortener.domain;
 
 import java.net.URI;
 import java.sql.Date;
-import java.util.Calendar;
 
 public class ShortURL {
 

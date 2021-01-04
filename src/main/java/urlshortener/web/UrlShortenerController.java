@@ -31,6 +31,7 @@ import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
+import urlshortener.socket_message.ValidationMessage;
 
 @Controller
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -95,7 +96,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     } else if (!shortUrlService.isValidated(id)) {
       System.out.println("ENTROOOOOOOOOOOOOOOeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }else{
+    } else {
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));

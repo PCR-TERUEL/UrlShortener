@@ -107,8 +107,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
-      System.out.println("Expiracion" + shortURL.getExpiration());
-      System.out.println("Actual" + new Date(0));
       return shortURL.getExpiration().compareTo(new Date(0)) == 0 &&
               shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {
