@@ -85,8 +85,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
    * @apiSuccess OK Url Redirect.
    * @apiError UrlNotFound The url was not found.
    */
-
-
   @RequestMapping(value = "/r/{id:(?).*}", method = RequestMethod.GET)
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
@@ -102,7 +100,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
-        System.out.println("ENTROOOOOOOOOOOOOOO");
+        System.out.println("ENTROOOOOOOOOOOOOOO null");
         return createSuccessfulRedirectToResponse(l);
       } else {
         System.out.println("ENTROOOOOOOOOOOOOOOfffffffffffffffffffffff");

@@ -54,6 +54,7 @@ public class UrlShortenerSocketController {
     @SendToUser("/url_shortener/short_url")
     public ShortUrlResponseMessage shortener(ShorUrlPetitionMessage petition,
                                              @Header("simpSessionId") String sessionId) throws InterruptedException {
+        int numMonth;
         String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7,
                 petition.getIdToken().length()-1));
         User u = secureUserService.getUser(username);
@@ -61,9 +62,15 @@ public class UrlShortenerSocketController {
         //Enviar sessionId para poder enviar cuando termine de validar
         URLValidatorService urlValidator = new URLValidatorService(petition.getUrl());
         ShortUrlResponseMessage outMessage = null;
+
         if (urlValidator.isValid()) {
+            try {
+                numMonth = Integer.parseInt(petition.getNumMonth());
+            } catch (NullPointerException | NumberFormatException exception){
+                numMonth = -1;
+            }
             ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
-                    String.valueOf(u.getId()), "", petition.getNumMonth());
+                    String.valueOf(u.getId()), "", numMonth);
             outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
                     petition.getIdToken());
         } else {

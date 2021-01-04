@@ -1,5 +1,6 @@
 package urlshortener.repository.impl;
 
+import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -106,8 +107,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
-
-      return shortURL.getExpiration() != null && shortURL.getExpiration().getTime() < System.currentTimeMillis();
+      System.out.println("Expiracion" + shortURL.getExpiration());
+      System.out.println("Actual" + new Date(0));
+      return shortURL.getExpiration().compareTo(new Date(0)) == 0 &&
+              shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {
       log.debug("When select for key {}", id, e);
       return false;
