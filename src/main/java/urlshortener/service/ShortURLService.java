@@ -85,7 +85,7 @@ public class ShortURLService {
   }
 
   public boolean isValidated(String id) {
-    System.out.println("---------------------" + findByKey(id).isValidated());
-    return findByKey(id) != null && findByKey(id).isValidated();
+    return true;
+    //return findByKey(id) != null && findByKey(id).isValidated();
   }
 }

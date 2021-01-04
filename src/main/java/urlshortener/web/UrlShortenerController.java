@@ -63,7 +63,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @RequestMapping(value = "/test", method = RequestMethod.GET)
   public ResponseEntity<?> test() {
     //taskQueueService.send("validation_job", "uno");
-    taskQueueService.publishValidationJob("123", "https://www.google.com", "5678", true);
+    taskQueueService.publishValidationJob("123", "https://www.eroski.com", "5678", true);
     return null;
   }
 
