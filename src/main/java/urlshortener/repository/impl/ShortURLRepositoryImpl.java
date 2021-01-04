@@ -66,6 +66,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness,
           su.getHash());
+
       return new ShortURL(
         su.getHash(), su.getTarget(), su.getUri(), su.getSponsor(),
         su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), safeness,
@@ -80,6 +81,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public void update(ShortURL su) {
     try {
+
       jdbc.update(
           "update shorturl set target=?, sponsor=?, created=?, expiration=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
           su.getTarget(), su.getSponsor(), su.getCreated(), su.getExpiration(),
@@ -138,13 +140,13 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public List<ShortURL> findByUser(String userId) {
     try {
+
       List<ShortURL>  shortURLS = jdbc.query("SELECT * FROM shorturl WHERE owner = ?",
                                   new Object[] {userId}, rowMapper);
 
       for (ShortURL url : shortURLS) {
         url.setClicks(countClicks(url));
       }
-
       return  shortURLS;
     } catch (Exception e) {
       log.debug("When select for target " + userId, e);

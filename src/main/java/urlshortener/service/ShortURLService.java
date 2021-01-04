@@ -29,14 +29,14 @@ public class ShortURLService {
 
   public List<ShortURL> findByUser(String userId) throws URISyntaxException {
     List<ShortURL> shortURLS = shortURLRepository.findByUser(userId);
+
     for (ShortURL shortURL : shortURLS) {
       shortURL.setUri(new URI(UrlShortenerController.HOST + "/r/" + shortURL.getHash()));
     }
-
      return shortURLRepository.findByUser(userId);
   }
 
-  private JSONObject toJson(List<ShortURL> shortList) {
+  public JSONObject toJson(List<ShortURL> shortList) {
     JSONObject jObject = new JSONObject();
 
     try

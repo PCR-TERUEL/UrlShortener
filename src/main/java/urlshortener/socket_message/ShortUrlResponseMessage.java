@@ -15,7 +15,7 @@ public class ShortUrlResponseMessage {
     }
 
     public ShortUrlResponseMessage(ShortURL shortURL, boolean error, boolean documentCsv, String idToken) {
-        this.uri = shortURL.getUri();
+        this.uri = shortURL !=null ? shortURL.getUri() : null;
         this.target = shortURL.getTarget();
         this.clicks = shortURL.getClicks();
         this.error = error;

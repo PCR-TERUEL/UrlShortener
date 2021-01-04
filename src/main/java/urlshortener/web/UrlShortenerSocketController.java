@@ -57,7 +57,7 @@ public class UrlShortenerSocketController {
         String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7,
                 petition.getIdToken().length()-1));
         User u = secureUserService.getUser(username);
-        System.out.println("LLEGO MENSAJE: " + petition.getUrl());
+
         //Enviar sessionId para poder enviar cuando termine de validar
         URLValidatorService urlValidator = new URLValidatorService(petition.getUrl());
         ShortUrlResponseMessage outMessage = null;
@@ -66,7 +66,6 @@ public class UrlShortenerSocketController {
                     String.valueOf(u.getId()), "", petition.getNumMonth());
             outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
                     petition.getIdToken());
-
         } else {
             outMessage = new ShortUrlResponseMessage(null, false,
                     petition.isDocumentCsv(), petition.getIdToken());

@@ -192,9 +192,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-    System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
-
-    return new ResponseEntity<>(urlShort, HttpStatus.OK);
+    return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
   }
 
 
