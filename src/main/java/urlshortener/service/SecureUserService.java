@@ -1,6 +1,7 @@
 package urlshortener.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,11 +11,14 @@ import org.springframework.security.core.userdetails.User;
 import urlshortener.domain.Role;
 import urlshortener.repository.UserRepository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 public class SecureUserService implements UserDetailsService {
+
 
     @Autowired
     private UserRepository userRepository;
@@ -24,11 +28,11 @@ public class SecureUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("Hello, Spring Security! with username: " + username);
+        System.out.println("Hello, Spring Security! let me check: " + username);
         urlshortener.domain.User user = userRepository.getUser(username);
-        System.out.println("Received user details from database: " + user.getUsername() + ":" + user.getPassword() + ":" + user.getRoleId());
 
         if (user != null) {
+            System.out.println("Received user details from database: " + user.getUsername() + ":" + user.getPassword() + ":" + user.getRoleId());
             return User.builder()
                     .username(user.getUsername())
                     .password(bCryptPasswordEncoder.encode(user.getPassword()))
@@ -38,9 +42,10 @@ public class SecureUserService implements UserDetailsService {
                     .credentialsExpired(false)
                     .roles(getRoleName(user))
                     .build();
-        } else {
-            throw new UsernameNotFoundException("Invalid username or password");
         }
+
+        throw new UsernameNotFoundException("User or password invalid");
+
     }
 
     private String getRoleName(urlshortener.domain.User u) {

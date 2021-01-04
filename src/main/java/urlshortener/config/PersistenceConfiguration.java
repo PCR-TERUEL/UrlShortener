@@ -69,7 +69,6 @@ public class PersistenceConfiguration implements WebMvcConfigurer {
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
     registry.addViewController("/").setViewName("index");
-    registry.addViewController("/login").setViewName("login");
     registry.addViewController("/panel").setViewName("panel");
     registry.addViewController("/error").setViewName("error");
   }

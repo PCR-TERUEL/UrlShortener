@@ -35,20 +35,6 @@ public class UrlShortenerSocketController {
         this.taskQueueService = taskQueueService;
     }
 
-    /**
-     * @api {post} /link Create short link
-     * @apiName Create short link
-     * @apiGroup ShortURL
-     *
-     * @apiParam {String} url URL you want to short.
-     * @apiParam {String} sponsor="sponsor" Sponsor.
-     * @apiParam {String} uuid User Id.
-     *
-     * @apiSuccess 201 Link generated successfully.
-     * @apiError  401 User does not exists.
-     * @apiError 400 Invalid or unreachable URL.
-     */
-
     @Async
     @MessageMapping("/link")
     @SendToUser("/url_shortener/short_url")

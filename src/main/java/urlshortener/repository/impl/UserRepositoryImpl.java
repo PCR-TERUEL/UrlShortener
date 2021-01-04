@@ -60,12 +60,12 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public User getUser(String username) {
-    try {
-      return jdbc.query("SELECT * FROM user WHERE USERNAME = ?", new Object[] {username}, rowMapper).get(0);
-    } catch (Exception e) {
+    List<User> users = jdbc.query("SELECT * FROM user WHERE USERNAME = ?", new Object[] {username}, rowMapper);
+    if (users.isEmpty()) {
       return null;
+    } else {
+      return users.get(0);
     }
-
   }
 
   @Override
