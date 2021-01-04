@@ -60,9 +60,6 @@ function connect() {
             let msg = JSON.parse(validation.body);
             if(msg.valid) {
                 document.getElementById(msg.shortUrl).href = msg.shortUrl;
-            } else {
-                alert("URl: " + msg.shortUrl + " no válida");
-                document.getElementById(msg.shortUrl).remove();
             }
             if(msg.csv){
                 addUrlCsvFile(msg);

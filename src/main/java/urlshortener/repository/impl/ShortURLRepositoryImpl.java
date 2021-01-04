@@ -48,6 +48,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public ShortURL save(ShortURL su) {
     try {
+      System.out.println("9999999999999999999999999999999999999999999999 " + su.getSafe());
       jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
           su.getHash(), su.getTarget(), su.getSponsor(),
           su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), su.getSafe(),
@@ -107,6 +108,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
+      System.out.println("Expiracion" + shortURL.getExpiration());
+      System.out.println("Actual" + new Date(0));
       return shortURL.getExpiration().compareTo(new Date(0)) == 0 &&
               shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {

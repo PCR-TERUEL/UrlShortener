@@ -74,14 +74,12 @@ public class UrlShortenerSocketController {
             ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
                     String.valueOf(u.getId()), "", numMonth);
             su.setUri(new URI("http://" + UrlShortenerController.HOST + "/r/" + su.getHash()));
-            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
-                    petition.getIdToken());
+            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false,
+                    petition.isDocumentCsv(), petition.getIdToken());
 
-            //sesion id info del websockets para mandar a un usuario concreto.
-            //url sin acortar
-            //url acortada
             System.out.println(su.getUri().toString());
-            taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(), petition.isDocumentCsv());
+            taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
+                    petition.isDocumentCsv());
 
             return outMessage;
         }catch (Exception e){
@@ -106,6 +104,7 @@ public class UrlShortenerSocketController {
         simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/validation_url",
                 validationMessage,
                 accessor.getMessageHeaders());
+        shortUrlService.validate(url, valid);
     }
     /* Para el metodo de enviar mensajes sin usar el return
     SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();

@@ -85,7 +85,13 @@ public class ShortURLService {
   }
 
   public boolean isValidated(String id) {
-    return true;
-    //return findByKey(id) != null && findByKey(id).isValidated();
+    return findByKey(id) != null && findByKey(id).isValidated();
+  }
+  public boolean validate(String url, boolean value){
+    List<ShortURL> urls = shortURLRepository.findByTarget(url);
+    if(urls.size() == 0)
+      return false;
+    System.out.println(urls.get(0).getHash() + value);
+    return shortURLRepository.mark(urls.get(0), value) != null;
   }
 }

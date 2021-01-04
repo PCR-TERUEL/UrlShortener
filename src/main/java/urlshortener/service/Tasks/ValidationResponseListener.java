@@ -20,8 +20,6 @@ public class ValidationResponseListener {
         boolean valid = message[2].equals("true");
         String url = message[3];
         boolean isCSV = message[4].equals("true");
-        System.out.println(valid);
-        System.out.println(message[2]);
         urlShortenerSocketController.sendValidation(shortedURL, valid ,sessionId, url, isCSV);
 
     }
