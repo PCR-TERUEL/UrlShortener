@@ -8,7 +8,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
-import net.minidev.json.JSONObject;
+
+import io.swagger.models.Model;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +27,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import urlshortener.config.JWTTokenUtil;
@@ -33,19 +39,13 @@ import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.socket_message.ValidationMessage;
 
-@Controller
+@RestController
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
   public static final String HOST = "localhost:8080";
   private final ShortURLService shortUrlService;
   private final ClickService clickService;
   private final TaskQueueService taskQueueService;
 
-  /*public UrlShortenerController(ShortURLService shortUrlService, ClickService clickService, SecureUserService userService, TaskQueueService taskQueueService) {
-    this.shortUrlService = shortUrlService;
-    this.clickService = clickService;
-    this.userService = userService;
-    this.taskQueueService = taskQueueService;
-  }*/
   private final SecureUserService secureUserService;
 
   @Autowired
@@ -59,9 +59,10 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     this.clickService = clickService;
     this.secureUserService = secureUserService;
     this.taskQueueService = taskQueueService;
+
   }
 
-  @RequestMapping(value = "/test", method = RequestMethod.GET)
+  @GetMapping(value = "/test")
   public ResponseEntity<?> test() {
     //taskQueueService.send("validation_job", "uno");
     //taskQueueService.publishValidationJob("123", "https://www.eroski.com", "5678", true);
@@ -75,80 +76,77 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     //this.secureUserService = secureUserService;
   }
 
-  /**
-   * @api {get} /{id:(?!link|index).*} Shortened url
-   * @apiName RedirectTo
-   * @apiGroup ShortURL
-   *
-   * @apiParam {Hash} id Shortened url unique ID.
-   *
-   * @apiSuccess OK Url Redirect.
-   * @apiError UrlNotFound The url was not found.
-   */
-  @RequestMapping(value = "/r/{id:(?).*}", method = RequestMethod.GET)
+  @Operation(summary = "Redirect to correspondent URL by the given hash")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "404", description = "URL not found", content = @Content),
+          @ApiResponse(responseCode = "400", description = "URL is not validated yet", content = @Content),
+          @ApiResponse(responseCode = "307", description = "Redirect OK")
+  })
+  @GetMapping(value = "/r/{id:(?).*}")
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
     if(shortUrlService.isExpired(id)) {
-      System.out.println("ENTROOOOOOOOOOOOOOOsssssssssssssssssssssssss");
       ShortURL l = shortUrlService.findByKey(id);
       shortUrlService.delete(l.getHash());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else if (!shortUrlService.isValidated(id)) {
-      System.out.println("ENTROOOOOOOOOOOOOOOeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     } else {
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
-        System.out.println("ENTROOOOOOOOOOOOOOO null");
         return createSuccessfulRedirectToResponse(l);
       } else {
-        System.out.println("ENTROOOOOOOOOOOOOOOfffffffffffffffffffffff");
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     }
 
   }
 
-  @RequestMapping(value = "/login")
-  public String login() {
+
+  @Operation(summary = "Check if user is logged in and give correspondent html")
+  @GetMapping(value = "/login")
+  public ModelAndView login() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     if (auth.getPrincipal() instanceof  UserDetails) {
-      return "redirect:/panel";
+      return new ModelAndView("redirect:/panel");
     }
 
-    return "userlogin";
+    return new ModelAndView("forward:/userlogin.html");
   }
 
-  @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+  @PostMapping(value = "/authenticate")
+  @Operation(summary = "Authenticate a user to get JWT")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "404", description = "Wrong username or password", content = @Content),
+          @ApiResponse(responseCode = "201", description = "Authentication OK", content = {
+                  @Content(mediaType = "application/json", schema = @Schema(implementation = JWT.class))
+          }),
+  })
   public ResponseEntity<?> createAuthenticationToken(@RequestParam String username,
                                                      @RequestParam String password,
-                                                     HttpServletResponse response) throws Exception {
+                                                     HttpServletResponse response)  {
 
-    System.out.println("Hey, " + username + " " + password);
-    authenticate(username, password);
-    UserDetails userDetails = secureUserService.loadUserByUsername(username);
-    String token = jwtTokenUtil.generateToken(userDetails);
-    response.addCookie(new Cookie("token", "Bearer " + token));
-    response.addCookie(new Cookie("username", username));
-
-    return ResponseEntity.ok(new JWT(token));
+    try {
+      authenticate(username, password);
+      UserDetails userDetails = secureUserService.loadUserByUsername(username);
+      String token = jwtTokenUtil.generateToken(userDetails);
+      response.addCookie(new Cookie("token", "Bearer " + token));
+      response.addCookie(new Cookie("username", username));
+      return ResponseEntity.ok(new JWT(token));
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 
-  /**
-   * @api {post} /signup User signup
-   * @apiName User register
-   * @apiGroup User
-   *
-   * @apiParam {String} username Username.
-   * @apiParam {String} password Password.
-   *
-   * @apiSuccess OK User registered successfully.
-   * @apiError  400 Bad user parameters.
-   * @apiError 226 Username already exists.
-   */
 
-  @RequestMapping(value = "/singup", method = RequestMethod.POST)
+  @PostMapping(value = "/singup")
+  @Operation(summary = "User sing up")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "400", description = "Wrong parameters"),
+          @ApiResponse(responseCode = "226", description = "User already exists"),
+          @ApiResponse(responseCode = "201", description = "User registration OK"),
+  })
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
     if(username.equals("") || password.equals("")){
@@ -164,28 +162,14 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     }
   }
 
-  @RequestMapping(value = "/delete", method = RequestMethod.GET)
-  public ResponseEntity<?> delete() {
-   return new ResponseEntity<>(HttpStatus.CREATED);
-  }
-
-
-  /**
-   * @api {post} /link Get user links
-   * @apiName Get user links
-   * @apiGroup ShortURL
-   *
-   * @apiParam {String} url URL you want to short.
-   * @apiParam {String} sponsor="sponsor" Sponsor.
-   * @apiParam {String} uuid User Id.
-   *
-   * @apiSuccess 201 Link generated successfully.
-   * @apiError  401 User does not exists.
-   * @apiError 400 Invalid or unreachable URL.
-   */
-
   @Async
-  @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
+  @PostMapping(value = "/userlinks")
+  @Operation(summary = "Get all links of an user")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "201", description = "User registration OK", content = {
+                  @Content(mediaType = "application/json", schema = @Schema(implementation = ShortURL.class))
+          }),
+  })
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
     String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
     User u = secureUserService.getUser(username);
@@ -194,58 +178,38 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
   }
 
-
-
-  @RequestMapping("/error")
-  public String error() {
-    return "error_no";
+  @GetMapping("/error")
+  public ModelAndView error() {
+    return new ModelAndView("forward:/error_no.html");
   }
 
-
-  /**
-   * @api {get} /users-information Get users information
-   * @apiName Get user intormation
-   * @apiGroup User
-   *
-   * @apiSuccess 201 Link generated successfully.
-   * @apiError  401 User does not exists.
-   * @apiError 400 Invalid or unreachable URL.
-   */
-  @RequestMapping(value = "/users-information", method = RequestMethod.GET)
+  @GetMapping(value = "/users-information")
+  @Operation(summary = "Get all users information")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "All users info OK", content = {
+                  @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))
+          })
+  })
   public ResponseEntity<?> getUsers() {
     return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
   }
 
-  /**
-   * @api {get} /user/{id} Delete a user
-   * @apiName Delete a user
-   * @apiGroup User
-   *
-   * @apiSuccess 201 User deleted successfully.
-   * @apiError  401 User does not exists.
-   * @apiError 400 Invalid or unreachable URL.
-   */
   @Async
   @DeleteMapping(value = "/user/{id}")
+  @Operation(summary = "Delete user")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "User deleted OK"),
+          @ApiResponse(responseCode = "404", description = "User does not exists"),
+  })
   public ResponseEntity<?> deleteUser(@PathVariable int id) {
     if (secureUserService.deleteUser(id)){
       return new ResponseEntity<>(HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   private String extractIP(HttpServletRequest request) {
     return request.getRemoteAddr();
-  }
-
-  private JSONObject createJSONResponse(String status, JSONObject jo) {
-    JSONObject jsonResponse = new JSONObject();
-    jsonResponse.put("status", status);
-    if (jo != null) {
-      jsonResponse.merge(jo);
-    }
-
-    return jsonResponse;
   }
 
   private ResponseEntity<?> createSuccessfulRedirectToResponse(ShortURL l) {
@@ -266,7 +230,4 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       throw new Exception("INVALID_CREDENTIALS", e);
     }
   }
-
-
-
 }

@@ -28,8 +28,15 @@ dependencies {
     implementation 'org.hibernate:hibernate-core:5.1.0.Final'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.projectlombok:lombok:1.18.16'
     compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.2'
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
+
+
 
 
 
