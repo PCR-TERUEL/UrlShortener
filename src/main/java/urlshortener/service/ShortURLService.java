@@ -66,13 +66,14 @@ public class ShortURLService {
     shortURLRepository.delete(id);
   }
 
-  public ShortURL save(String url, String sponsor, String owner, String ip) {
+  public ShortURL save(String url, String sponsor, String owner, String ip, int numMonth) {
 
     ShortURL su = ShortURLBuilder.newInstance()
         .target(url)
         .uri((String hash) -> linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri())
         .sponsor(sponsor)
         .createdNow()
+        .addDateExpiration(numMonth)
         .owner(owner)
         .temporaryRedirect()
         .treatAsSafe()
@@ -84,6 +85,7 @@ public class ShortURLService {
   }
 
   public boolean isValidated(String id) {
+    System.out.println("---------------------" + findByKey(id).isValidated());
     return findByKey(id) != null && findByKey(id).isValidated();
   }
 }

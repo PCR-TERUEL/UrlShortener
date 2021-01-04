@@ -59,8 +59,12 @@ public class ShortURLBuilder {
 
   ShortURLBuilder createdNow() {
     this.created = new Date(System.currentTimeMillis());
+    return this;
+  }
+
+  ShortURLBuilder addDateExpiration(int numMonth) {
     Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.MONTH, 1);
+    calendar.add(Calendar.MONTH, numMonth);
     this.expiration = new Date(calendar.getTimeInMillis());
     return this;
   }

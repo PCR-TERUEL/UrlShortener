@@ -1,8 +1,11 @@
 package urlshortener.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import urlshortener.config.JWTTokenUtil;
@@ -14,17 +17,22 @@ import urlshortener.service.URLValidatorService;
 import urlshortener.socket_message.ShorUrlPetitionMessage;
 import urlshortener.socket_message.ShortUrlResponseMessage;
 
+import java.security.Principal;
+
 @Controller
 public class UrlShortenerSocketController {
     private ShortURLService shortUrlService;
+    private SimpMessageSendingOperations simpMessageSendingOperations;
     private final SecureUserService secureUserService;
+
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
-    public UrlShortenerSocketController(ShortURLService shortUrlService, SecureUserService secureUserService) {
+    public UrlShortenerSocketController(ShortURLService shortUrlService, SecureUserService secureUserService,
+                                        SimpMessageSendingOperations simpMessageSendingOperations) {
         this.shortUrlService = shortUrlService;
         this.secureUserService = secureUserService;
-
+        this.simpMessageSendingOperations = simpMessageSendingOperations;
     }
 
     /**
@@ -43,16 +51,31 @@ public class UrlShortenerSocketController {
 
     @Async
     @MessageMapping("/link")
-    @SendTo("/url_shortener/short_url")
-    public ShortUrlResponseMessage shortener(ShorUrlPetitionMessage petition) {
-        String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7, petition.getIdToken().length()-1));
+    @SendToUser("/url_shortener/short_url")
+    public ShortUrlResponseMessage shortener(ShorUrlPetitionMessage petition,
+                                             @Header("simpSessionId") String sessionId) throws InterruptedException {
+        String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7,
+                petition.getIdToken().length()-1));
         User u = secureUserService.getUser(username);
+        System.out.println("LLEGO MENSAJE: " + petition.getUrl());
+        //Enviar sessionId para poder enviar cuando termine de validar
         URLValidatorService urlValidator = new URLValidatorService(petition.getUrl());
-
+        ShortUrlResponseMessage outMessage = null;
         if (urlValidator.isValid()) {
-            ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(), String.valueOf(u.getId()), "");
-            return new ShortUrlResponseMessage(su, false);
+            ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
+                    String.valueOf(u.getId()), "", petition.getNumMonth());
+            outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
+                    petition.getIdToken());
+
+        } else {
+            outMessage = new ShortUrlResponseMessage(null, false,
+                    petition.isDocumentCsv(), petition.getIdToken());
         }
-        return new ShortUrlResponseMessage(null, false);
+        return outMessage;
     }
+    /* Para el metodo de enviar mensajes sin usar el return
+    SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
+        accessor.setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
+        simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/short_url", outMessage,
+            accessor.getMessageHeaders());*/
 }

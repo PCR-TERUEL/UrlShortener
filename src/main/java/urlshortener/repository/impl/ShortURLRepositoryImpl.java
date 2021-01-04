@@ -105,11 +105,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
 
-      if(shortURL.getExpiration().getTime() < System.currentTimeMillis()){
-        return false;
-      } else {
-        return false;
-      }
+      return shortURL.getExpiration() != null && shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {
       log.debug("When select for key {}", id, e);
       return false;

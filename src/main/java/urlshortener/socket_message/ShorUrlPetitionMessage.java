@@ -4,17 +4,39 @@ public class ShorUrlPetitionMessage {
     private String url;
     private String sponsor;
     private String idToken;
+    private int numMonth;
+    private boolean documentCsv;
 
-    public ShorUrlPetitionMessage(String url, String idToken) {
+    public ShorUrlPetitionMessage(String url, String idToken, Boolean documentCsv) {
         this.url = url;
         this.sponsor = "";
         this.idToken = idToken;
+        this.documentCsv = documentCsv;
+        this.numMonth = 0;
     }
 
-    public ShorUrlPetitionMessage(String url, String sponsor, String idToken){
+    public ShorUrlPetitionMessage(String url, String idToken, Boolean documentCsv, int numMonth) {
+        this.url = url;
+        this.sponsor = "";
+        this.idToken = idToken;
+        this.documentCsv = documentCsv;
+        this.numMonth = numMonth;
+    }
+
+    public ShorUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv){
         this.url = url;
         this.sponsor = sponsor;
         this.idToken = idToken;
+        this.documentCsv = documentCsv;
+        this.numMonth = 0;
+    }
+
+    public ShorUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv, int numMonth){
+        this.url = url;
+        this.sponsor = sponsor;
+        this.idToken = idToken;
+        this.documentCsv = documentCsv;
+        this.numMonth = numMonth;
     }
 
     public ShorUrlPetitionMessage() {
@@ -30,5 +52,14 @@ public class ShorUrlPetitionMessage {
 
     public String getIdToken() {
         return idToken;
+    }
+
+    public boolean isDocumentCsv() {
+        return documentCsv;
+    }
+
+    public int getNumMonth() {
+        System.out.println(numMonth);
+        return numMonth;
     }
 }

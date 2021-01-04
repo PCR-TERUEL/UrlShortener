@@ -91,17 +91,21 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
     if(shortUrlService.isExpired(id)) {
+      System.out.println("ENTROOOOOOOOOOOOOOOsssssssssssssssssssssssss");
       ShortURL l = shortUrlService.findByKey(id);
       shortUrlService.delete(l.getHash());
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else if (!shortUrlService.isValidated(id)) {
+      System.out.println("ENTROOOOOOOOOOOOOOOeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }else{
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
+        System.out.println("ENTROOOOOOOOOOOOOOO");
         return createSuccessfulRedirectToResponse(l);
       } else {
+        System.out.println("ENTROOOOOOOOOOOOOOOfffffffffffffffffffffff");
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     }
@@ -210,7 +214,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
    * @apiError  401 User does not exists.
    * @apiError 400 Invalid or unreachable URL.
    */
-
   @RequestMapping(value = "/users-information", method = RequestMethod.GET)
   public ResponseEntity<?> getUsers() {
     return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
@@ -225,7 +228,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
    * @apiError  401 User does not exists.
    * @apiError 400 Invalid or unreachable URL.
    */
-
+  @Async
   @DeleteMapping(value = "/user/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable int id) {
     if (secureUserService.deleteUser(id)){
