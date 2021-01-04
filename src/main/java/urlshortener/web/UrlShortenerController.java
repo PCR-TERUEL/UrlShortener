@@ -30,6 +30,7 @@ import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
+import urlshortener.service.Tasks.TaskQueueService;
 
 @Controller
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -59,8 +60,10 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     this.taskQueueService = taskQueueService;
   }
 
-  @RequestMapping(value = "/test", method = RequestMethod.POST)
+  @RequestMapping(value = "/test", method = RequestMethod.GET)
   public ResponseEntity<?> test() {
+    //taskQueueService.send("validation_job", "uno");
+    taskQueueService.publishValidationJob("123", "https://www.google.com", "5678", true);
     return null;
   }
 

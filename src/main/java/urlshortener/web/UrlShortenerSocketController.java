@@ -3,7 +3,6 @@ package urlshortener.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Async;
@@ -13,12 +12,9 @@ import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
-import urlshortener.service.TaskQueueService;
-import urlshortener.service.URLValidatorService;
+import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.socket_message.ShorUrlPetitionMessage;
 import urlshortener.socket_message.ShortUrlResponseMessage;
-
-import java.security.Principal;
 
 @Controller
 public class UrlShortenerSocketController {
@@ -77,7 +73,7 @@ public class UrlShortenerSocketController {
         //url sin acortar
         //url acortada
         System.out.println(su.getUri().toString());
-        taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString());
+        taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(), petition.isDocumentCsv());
 
         return outMessage;
     }
@@ -86,4 +82,10 @@ public class UrlShortenerSocketController {
         accessor.setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
         simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/short_url", outMessage,
             accessor.getMessageHeaders());*/
+
+    public void sendValidation(String shortUri, Boolean valid, String id, String sessionId, boolean isCSV){
+        /**
+         * PLEASE EDU FILL THIS
+         */
+    }
 }

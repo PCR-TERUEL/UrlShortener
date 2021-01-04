@@ -1,4 +1,4 @@
-package urlshortener.service;
+package urlshortener.service.Tasks;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,6 +11,7 @@ public class TaskQueueService {
     public static final String VALIDATION_RESPONSE_QUEUE = "validation_resp";
     public static final String REFRESH_JOB_QUEUE = "refresh_job";
     public static final String REFRESH_RESPONSE_QUEUE= "refresh_resp";
+    public static final String SEPARATOR= "@";
     @Autowired
     private RabbitTemplate template;
 
@@ -22,8 +23,8 @@ public class TaskQueueService {
         System.out.println();
         System.out.println(" [x] Sent "+ tasks.getName() + "'" + message + "'");
     }
-    public void publishValidationJob(String sessionId, String url, String shortedURL) {
-        String message =  sessionId + "@" + url + "@"+ shortedURL;
+    public void publishValidationJob(String sessionId, String url, String shortedURL, boolean isCSV) {
+        String message =  sessionId + SEPARATOR + url + SEPARATOR + shortedURL + SEPARATOR + isCSV;
         this.template.convertAndSend(VALIDATION_JOB_QUEUE, message);
 
         System.out.println(" [x] Sent "+ tasks.getName() + "'" + message + "'");
