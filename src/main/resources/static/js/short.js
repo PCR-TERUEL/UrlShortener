@@ -98,7 +98,7 @@ function dealMessageFromServer(msg) {
  */
 function appendRow(msg){
         var markup
-        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+        markup = "<tr><td class=\"first-column\"><a href=" + msg.target+ ">" + msg.target +"</td>" +
             "<td><a id=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
         var tableBody = $("tbody");
         tableBody.append(markup);
