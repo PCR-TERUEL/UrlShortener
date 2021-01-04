@@ -1,5 +1,6 @@
 package urlshortener.repository.impl;
 
+import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -66,6 +67,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness,
           su.getHash());
+
       return new ShortURL(
         su.getHash(), su.getTarget(), su.getUri(), su.getSponsor(),
         su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), safeness,
@@ -80,6 +82,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public void update(ShortURL su) {
     try {
+
       jdbc.update(
           "update shorturl set target=?, sponsor=?, created=?, expiration=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
           su.getTarget(), su.getSponsor(), su.getCreated(), su.getExpiration(),
@@ -104,8 +107,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
-
-      return shortURL.getExpiration() != null && shortURL.getExpiration().getTime() < System.currentTimeMillis();
+      System.out.println("Expiracion" + shortURL.getExpiration());
+      System.out.println("Actual" + new Date(0));
+      return shortURL.getExpiration().compareTo(new Date(0)) == 0 &&
+              shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {
       log.debug("When select for key {}", id, e);
       return false;
@@ -138,13 +143,13 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public List<ShortURL> findByUser(String userId) {
     try {
+
       List<ShortURL>  shortURLS = jdbc.query("SELECT * FROM shorturl WHERE owner = ?",
                                   new Object[] {userId}, rowMapper);
 
       for (ShortURL url : shortURLS) {
         url.setClicks(countClicks(url));
       }
-
       return  shortURLS;
     } catch (Exception e) {
       log.debug("When select for target " + userId, e);

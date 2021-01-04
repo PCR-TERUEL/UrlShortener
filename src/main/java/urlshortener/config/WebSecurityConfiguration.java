@@ -54,7 +54,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll()
         .and().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
-        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**",
+        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**", "/test",
         "/css/**", "/img/**", "/js/**", "/lib/**", "/images").permitAll().anyRequest().authenticated()
         .and()
         .logout().addLogoutHandler(((request, response, auth) -> {

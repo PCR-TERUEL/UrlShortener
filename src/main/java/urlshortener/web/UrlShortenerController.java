@@ -31,6 +31,7 @@ import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
+import urlshortener.service.Tasks.TaskQueueService;
 
 @Controller
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -61,12 +62,10 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   }
 
-  @RequestMapping(value = "/test", method = RequestMethod.POST)
+  @RequestMapping(value = "/test", method = RequestMethod.GET)
   public ResponseEntity<?> test() {
-    taskQueueService.send("one");
-    taskQueueService.send("two");
-    taskQueueService.send("tree");
-    taskQueueService.send("caramba");
+    //taskQueueService.send("validation_job", "uno");
+    taskQueueService.publishValidationJob("123", "https://www.google.com", "5678", true);
     return null;
   }
 
@@ -87,8 +86,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
    * @apiSuccess OK Url Redirect.
    * @apiError UrlNotFound The url was not found.
    */
-
-
   @RequestMapping(value = "/r/{id:(?).*}", method = RequestMethod.GET)
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
@@ -104,7 +101,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
-        System.out.println("ENTROOOOOOOOOOOOOOO");
+        System.out.println("ENTROOOOOOOOOOOOOOO null");
         return createSuccessfulRedirectToResponse(l);
       } else {
         System.out.println("ENTROOOOOOOOOOOOOOOfffffffffffffffffffffff");
@@ -197,9 +194,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-    System.out.println("Hi, I'm " + u.getUsername() + "with id: " + u.getId() + " And those are my urls: " + urlShort);
-
-    return new ResponseEntity<>(urlShort, HttpStatus.OK);
+    return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
   }
 
 

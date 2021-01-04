@@ -63,9 +63,15 @@ public class ShortURLBuilder {
   }
 
   ShortURLBuilder addDateExpiration(int numMonth) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.MONTH, numMonth);
-    this.expiration = new Date(calendar.getTimeInMillis());
+    if(numMonth == -1){
+      this.expiration = new Date(0);
+    } else {
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.MONTH, numMonth);
+      this.expiration = new Date(calendar.getTimeInMillis());
+    }
+
+    System.out.println("El numMonth es -> " + numMonth + " y la fecha guardada es ->" + expiration);
     return this;
   }
 

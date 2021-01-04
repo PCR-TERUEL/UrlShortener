@@ -61,7 +61,6 @@ function connect() {
 function addUrlCsvFile(msg) {
     retval += msg.target + ";" + msg.uri + ";" + msg.clicks +"\n";
     numUrlsCsvReceive++;
-    alert("ENTRO " + numUrlsCsvReceive);
     if(numUrlsCsvSends <= numUrlsCsvReceive && numUrlsCsvSends !== 0){
         download('results.csv', retval);
         numUrlsCsvReceive = 0;
