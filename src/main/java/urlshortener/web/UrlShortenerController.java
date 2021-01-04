@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -57,6 +58,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     this.clickService = clickService;
     this.secureUserService = secureUserService;
     this.taskQueueService = taskQueueService;
+
   }
 
   @RequestMapping(value = "/test", method = RequestMethod.POST)
@@ -128,6 +130,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
     System.out.println("Hey, " + username + " " + password);
     authenticate(username, password);
+    System.out.println("Ok.");
     UserDetails userDetails = secureUserService.loadUserByUsername(username);
     String token = jwtTokenUtil.generateToken(userDetails);
     response.addCookie(new Cookie("token", "Bearer " + token));
@@ -188,7 +191,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @Async
   @RequestMapping(value = "/userlinks", method = RequestMethod.POST)
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
+    System.out.println("Llego ok 1");
     String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
+    System.out.println("Llego ok 2");
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
@@ -269,7 +274,4 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       throw new Exception("INVALID_CREDENTIALS", e);
     }
   }
-
-
-
 }

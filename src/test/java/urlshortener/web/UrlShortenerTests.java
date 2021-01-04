@@ -28,11 +28,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import urlshortener.Application;
+import urlshortener.config.JWTTokenUtil;
+import urlshortener.config.WebSecurityConfiguration;
+import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.ClickService;
@@ -44,19 +49,18 @@ public class UrlShortenerTests {
   private MockMvc mockMvc;
 
   @Mock
-  private ClickService clickService;
-
-  @Mock
   private ShortURLService shortUrlService;
 
   @Mock
   private SecureUserService userService;
 
+  @Mock
+  private JWTTokenUtil jwtTokenUtil;
+
   @InjectMocks
   private UrlShortenerController urlShortener;
 
-  @Autowired
-  private UrlShortenerController urlShortenerController;
+
 
   @Before
   public void setup() {
@@ -83,9 +87,6 @@ public class UrlShortenerTests {
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("token", is(notNullValue()))).andReturn();
-
-    System.out.println(result.getResponse().getContentAsString());
-
   }
 
   @Test
@@ -104,6 +105,14 @@ public class UrlShortenerTests {
             .andExpect(jsonPath("$.sponsor", is(nullValue())));
   }
 
+  @Test
+  public void thatDoSomethingPlease() throws Exception {
+    configureUserLinks("user");
+
+    mockMvc.perform(post("/userlinks"));
+  }
+
+/*
   @Test
   public void thatShortenerCreatesARedirectIfTheURLisOK2() throws Exception {
     configureUrlSave(null);
@@ -140,11 +149,6 @@ public class UrlShortenerTests {
   }
 
 
-
-  @Test
-  public void thatShortenerCreatesARedirectWithSponsor() throws Exception {
-    configureUrlSave("http://sponsor.com/");
-
     mockMvc.perform(
         post("/link").param("url", "http://example.com/").param(
             "sponsor", "http://sponsor.com/").param("uuid","0")).andDo(print())
@@ -172,9 +176,12 @@ public class UrlShortenerTests {
     mockMvc.perform(post("/link").param("url", "someKey")).andDo(print())
         .andExpect(status().isBadRequest());
   }
+*/
+
+
 
   private void configureUrlSave(String sponsor) {
-    when(shortUrlService.save(any(),  any(), any(), any()))
+    when(shortUrlService.save(any(),  any(), any(), any(), any()))
         .then((Answer<ShortURL>) invocation -> new ShortURL(
             "f684a3c4",
             "http://example.com/",
@@ -194,6 +201,11 @@ public class UrlShortenerTests {
             .then((Answer<Boolean>) invocation -> true);
   }
 
+
+  private void configureUserLinks(String username) {
+    when(jwtTokenUtil.getUsernameFromToken(any()))
+            .then((Answer<String>) invocation -> "user");
+  }
 
   private Date getExpirationDate() {
     Calendar calendar = Calendar.getInstance();
