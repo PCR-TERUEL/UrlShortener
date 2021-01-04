@@ -13,6 +13,7 @@ import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
+import urlshortener.service.TaskQueueService;
 import urlshortener.service.URLValidatorService;
 import urlshortener.socket_message.ShorUrlPetitionMessage;
 import urlshortener.socket_message.ShortUrlResponseMessage;
@@ -24,15 +25,18 @@ public class UrlShortenerSocketController {
     private ShortURLService shortUrlService;
     private SimpMessageSendingOperations simpMessageSendingOperations;
     private final SecureUserService secureUserService;
+    private final TaskQueueService taskQueueService;
 
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
     public UrlShortenerSocketController(ShortURLService shortUrlService, SecureUserService secureUserService,
-                                        SimpMessageSendingOperations simpMessageSendingOperations) {
+                                        SimpMessageSendingOperations simpMessageSendingOperations,
+                                        TaskQueueService taskQueueService) {
         this.shortUrlService = shortUrlService;
         this.secureUserService = secureUserService;
         this.simpMessageSendingOperations = simpMessageSendingOperations;
+        this.taskQueueService = taskQueueService;
     }
 
     /**
@@ -59,24 +63,22 @@ public class UrlShortenerSocketController {
                 petition.getIdToken().length()-1));
         User u = secureUserService.getUser(username);
 
-        //Enviar sessionId para poder enviar cuando termine de validar
-        URLValidatorService urlValidator = new URLValidatorService(petition.getUrl());
-        ShortUrlResponseMessage outMessage = null;
-
-        if (urlValidator.isValid()) {
-            try {
-                numMonth = Integer.parseInt(petition.getNumMonth());
-            } catch (NullPointerException | NumberFormatException exception){
-                numMonth = -1;
-            }
-            ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
-                    String.valueOf(u.getId()), "", numMonth);
-            outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
-                    petition.getIdToken());
-        } else {
-            outMessage = new ShortUrlResponseMessage(null, false,
-                    petition.isDocumentCsv(), petition.getIdToken());
+        try {
+            numMonth = Integer.parseInt(petition.getNumMonth());
+        } catch (NullPointerException | NumberFormatException exception){
+            numMonth = -1;
         }
+        ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
+                String.valueOf(u.getId()), "", numMonth);
+        ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
+                petition.getIdToken());
+
+        //sesion id info del websockets para mandar a un usuario concreto.
+        //url sin acortar
+        //url acortada
+        System.out.println(su.getUri().toString());
+        taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString());
+
         return outMessage;
     }
     /* Para el metodo de enviar mensajes sin usar el return

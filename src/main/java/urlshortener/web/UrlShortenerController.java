@@ -61,10 +61,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @RequestMapping(value = "/test", method = RequestMethod.POST)
   public ResponseEntity<?> test() {
-    taskQueueService.send("one");
-    taskQueueService.send("two");
-    taskQueueService.send("tree");
-    taskQueueService.send("caramba");
     return null;
   }
 
