@@ -2,7 +2,6 @@ package urlshortener.domain;
 
 import java.net.URI;
 import java.sql.Date;
-import java.util.Calendar;
 
 public class ShortURL {
 
@@ -18,7 +17,6 @@ public class ShortURL {
   private String ip;
   private String country;
   private Long clicks;
-  private Boolean validated;
 
   public ShortURL(String hash, String target, URI uri, String sponsor,
                   Date created, Date expiration, Long owner, Integer mode, Boolean safe, String ip,
@@ -34,19 +32,14 @@ public class ShortURL {
     this.safe = safe;
     this.ip = ip;
     this.country = country;
-    this.validated = false;
     this.clicks = 0L;
   }
 
   public ShortURL() {
   }
 
-  public void setValidated(Boolean validated) {
-    this.validated = validated;
-  }
-
   public Boolean isValidated() {
-    return validated;
+    return safe;
   }
 
   public String getHash() {
@@ -132,7 +125,6 @@ public class ShortURL {
   public void setSafe(Boolean safe) {
     this.safe = safe;
   }
-
   public void setIp(String ip) {
     this.ip = ip;
   }

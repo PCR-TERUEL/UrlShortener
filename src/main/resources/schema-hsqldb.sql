@@ -16,7 +16,7 @@ CREATE TABLE SHORTURL
     EXPIRATION DATE,                 -- Expiration date
     OWNER   BIGINT,           -- User id
     MODE    INTEGER,                 -- Redirect mode
-    SAFE    BOOLEAN,                 -- Safe target
+    SAFE    BOOLEAN DEFAULT false,                 -- Safe target
     IP      VARCHAR(20),             -- IP
     COUNTRY VARCHAR(50)              -- Country
 );

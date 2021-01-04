@@ -3,6 +3,7 @@ package urlshortener.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.scheduling.annotation.Async;
@@ -15,6 +16,11 @@ import urlshortener.service.ShortURLService;
 import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.socket_message.ShorUrlPetitionMessage;
 import urlshortener.socket_message.ShortUrlResponseMessage;
+import urlshortener.socket_message.ValidationMessage;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Principal;
 
 @Controller
 public class UrlShortenerSocketController {
@@ -39,29 +45,52 @@ public class UrlShortenerSocketController {
     @MessageMapping("/link")
     @SendToUser("/url_shortener/short_url")
     public ShortUrlResponseMessage shortener(ShorUrlPetitionMessage petition,
-                                             @Header("simpSessionId") String sessionId) throws InterruptedException {
-        int numMonth;
-        String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7,
-                petition.getIdToken().length()-1));
-        User u = secureUserService.getUser(username);
-
+                                             @Header("simpSessionId") String sessionId) {
         try {
-            numMonth = Integer.parseInt(petition.getNumMonth());
-        } catch (NullPointerException | NumberFormatException exception){
-            numMonth = -1;
+            int numMonth;
+            String username = jwtTokenUtil.getUsernameFromToken(petition.getIdToken().substring(7,
+                    petition.getIdToken().length() - 1));
+            User u = secureUserService.getUser(username);
+
+            try {
+                numMonth = Integer.parseInt(petition.getNumMonth());
+            } catch (NullPointerException | NumberFormatException exception){
+                numMonth = -1;
+            }
+            ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
+                    String.valueOf(u.getId()), "", numMonth);
+            su.setUri(new URI("http://" + UrlShortenerController.HOST + "/r/" + su.getHash()));
+            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false,
+                    petition.isDocumentCsv(), petition.getIdToken());
+
+            System.out.println(su.getUri().toString());
+            taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
+                    petition.isDocumentCsv());
+
+            return outMessage;
+        }catch (Exception e){
+            e.printStackTrace();
+            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(null, true,
+                    petition.isDocumentCsv(),
+                    petition.getIdToken());
+            return outMessage;
         }
-        ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
-                String.valueOf(u.getId()), "", numMonth);
-        ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false, petition.isDocumentCsv(),
-                petition.getIdToken());
+    }
 
-        //sesion id info del websockets para mandar a un usuario concreto.
-        //url sin acortar
-        //url acortada
-        System.out.println(su.getUri().toString());
-        taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(), petition.isDocumentCsv());
-
-        return outMessage;
+    /**
+     * This method send the message with the result of the validation of a URL.
+     * @param shortUrl: shortUrl created as of the url validated
+     * @param valid: result of the validation
+     * @param sessionId: sessionId of the client to send the message
+     */
+    public void sendValidation(String shortUrl, Boolean valid, String sessionId, String url, Boolean isCSV){
+        ValidationMessage validationMessage = new ValidationMessage(shortUrl, valid, url, isCSV);
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
+        accessor.setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
+        simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/validation_url",
+                validationMessage,
+                accessor.getMessageHeaders());
+        shortUrlService.validate(url, valid);
     }
     /* Para el metodo de enviar mensajes sin usar el return
     SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
@@ -69,9 +98,4 @@ public class UrlShortenerSocketController {
         simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/short_url", outMessage,
             accessor.getMessageHeaders());*/
 
-    public void sendValidation(String shortUri, Boolean valid, String id, String sessionId, boolean isCSV){
-        /**
-         * PLEASE EDU FILL THIS
-         */
-    }
 }

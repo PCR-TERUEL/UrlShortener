@@ -37,6 +37,7 @@ import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
+import urlshortener.socket_message.ValidationMessage;
 
 @RestController
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -64,7 +65,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @GetMapping(value = "/test")
   public ResponseEntity<?> test() {
     //taskQueueService.send("validation_job", "uno");
-    taskQueueService.publishValidationJob("123", "https://www.google.com", "5678", true);
+    //taskQueueService.publishValidationJob("123", "https://www.eroski.com", "5678", true);
     return null;
   }
 
@@ -90,7 +91,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else if (!shortUrlService.isValidated(id)) {
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }else{
+    } else {
       ShortURL l = shortUrlService.findByKey(id);
       if (l != null) {
         clickService.saveClick(id, extractIP(request));
@@ -99,6 +100,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     }
+
   }
 
 

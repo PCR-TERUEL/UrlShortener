@@ -43,6 +43,7 @@ $(document).ready(function () {
     });
 });
 
+
 /**
  * Do a petition to connect with the web socket server.
  * If the connection was successful subscribe to the queue for get the messages from the server and show the short url.
@@ -55,11 +56,24 @@ function connect() {
         stompClient.subscribe('/user/url_shortener/short_url', function (response) {
             dealMessageFromServer(JSON.parse(response.body));
         });
+        stompClient.subscribe('/user/url_shortener/validation_url', function (validation) {
+            let msg = JSON.parse(validation.body);
+            if(msg.valid) {
+                document.getElementById(msg.shortUrl).href = msg.shortUrl;
+            }
+            if(msg.csv){
+                addUrlCsvFile(msg);
+            }
+        });
     });
 }
 
 function addUrlCsvFile(msg) {
-    retval += msg.target + ";" + msg.uri + ";" + msg.clicks +"\n";
+    if(msg.valid) {
+        retval += msg.url + ";" + msg.shortUrl + ";" + "0\n";
+    } else {
+        retval += msg.url + ";web no alcanzable;\n";
+    }
     numUrlsCsvReceive++;
     if(numUrlsCsvSends <= numUrlsCsvReceive && numUrlsCsvSends !== 0){
         download('results.csv', retval);
@@ -73,9 +87,8 @@ function addUrlCsvFile(msg) {
  * @param msg message send by the server
  */
 function dealMessageFromServer(msg) {
-    appendRow(msg);
-    if(msg.documentCsv){
-        addUrlCsvFile(msg);
+    if(!msg.error) {
+        appendRow(msg);
     }
 }
 
@@ -85,13 +98,8 @@ function dealMessageFromServer(msg) {
  */
 function appendRow(msg){
         var markup
-       // if(msg.valid === "undefined"){
-            markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
-                "<td><a href=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
-        /*}else{
-            markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
-                "<td>" + msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
-        }*/
+        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+            "<td><a id=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
         var tableBody = $("tbody");
         tableBody.append(markup);
         $("#feedback").empty();

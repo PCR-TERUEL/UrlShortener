@@ -48,6 +48,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public ShortURL save(ShortURL su) {
     try {
+      System.out.println("9999999999999999999999999999999999999999999999 " + su.getSafe());
       jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
           su.getHash(), su.getTarget(), su.getSponsor(),
           su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), su.getSafe(),
