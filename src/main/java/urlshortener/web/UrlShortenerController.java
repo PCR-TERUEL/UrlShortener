@@ -85,20 +85,18 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @GetMapping(value = "/r/{id:(?).*}")
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
-    if(shortUrlService.isExpired(id)) {
-      ShortURL l = shortUrlService.findByKey(id);
-      shortUrlService.delete(l.getHash());
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else if (!shortUrlService.isValidated(id)) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    } else {
-      ShortURL l = shortUrlService.findByKey(id);
-      if (l != null) {
-        clickService.saveClick(id, extractIP(request));
-        return createSuccessfulRedirectToResponse(l);
-      } else {
+    ShortURL l = shortUrlService.findByKey(id);
+    if (l != null) {
+      if(shortUrlService.isExpired(id)) {
+        shortUrlService.delete(l.getHash());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      } else if (!shortUrlService.isValidated(id)) {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
+      clickService.saveClick(id, extractIP(request));
+      return createSuccessfulRedirectToResponse(l);
+    } else {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
   }
@@ -163,6 +161,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     }
   }
 
+
   @Async
   @PostMapping(value = "/userlinks")
   @Operation(summary = "Get all links of an user")
@@ -176,8 +175,12 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
+    if(urlShort.size() > 0) {
+      System.out.println("--------------------------------> " + urlShort.get(0).getSafe());
+    }
     return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
   }
+
 
   @GetMapping("/error")
   public ModelAndView error() {
@@ -194,6 +197,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public ResponseEntity<?> getUsers() {
     return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
   }
+
 
   @Async
   @DeleteMapping(value = "/user/{id}")
