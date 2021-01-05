@@ -6,6 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.springframework.stereotype.Service;
+import urlshortener.domain.Metric;
 import urlshortener.domain.ShortURL;
 import urlshortener.repository.ShortURLRepository;
 import urlshortener.web.UrlShortenerController;
@@ -59,6 +60,29 @@ public class ShortURLService {
 
   }
 
+  public JSONObject metricToJSON(List<Metric> list) {
+    JSONObject jObject = new JSONObject();
+
+    try
+    {
+      JSONArray jArray = new JSONArray();
+      for (Metric metric : list)
+      {
+        JSONObject shortJSON = new JSONObject();
+        shortJSON.put( "uri", "http://" + UrlShortenerController.HOST + "/r/" + metric.getShortedUrl());
+        shortJSON.put("target", metric.getUrl());
+        shortJSON.put("clicks", metric.getClicks());
+        shortJSON.put("valid", metric.isValid());
+        jArray.add(shortJSON);
+      }
+      jObject.put("urlList", jArray);
+      return jObject;
+    } catch (Exception e) {
+      return null;
+    }
+
+  }
+
   public boolean isExpired(String id){
     return shortURLRepository.isExpired(id);
   }
@@ -70,7 +94,7 @@ public class ShortURLService {
   public ShortURL save(String url, String sponsor, String owner, String ip, int numMonth) {
 
     ShortURL su = ShortURLBuilder.newInstance()
-        .target(url)
+        .target(url, owner)
         .uri((String hash) -> linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri())
         .sponsor(sponsor)
         .createdNow()

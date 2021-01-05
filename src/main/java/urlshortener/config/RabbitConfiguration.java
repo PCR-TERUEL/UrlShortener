@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.amqp.core.Queue;
+import urlshortener.service.Tasks.MetricsResponseListener;
 import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.service.Tasks.ValidationResponseListener;
 
@@ -18,8 +19,9 @@ public class RabbitConfiguration {
     @Bean
     public TaskQueueService taskQueueService(){return new TaskQueueService();}
     @Bean
-    public ValidationResponseListener receiver() {
+    public ValidationResponseListener validationReceiver() {
         return new ValidationResponseListener();
     }
-
+    @Bean
+    public MetricsResponseListener metricReceiver() {  return new MetricsResponseListener(); }
 }

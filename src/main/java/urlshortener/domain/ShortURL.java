@@ -132,4 +132,22 @@ public class ShortURL {
   public void setCountry(String country) {
     this.country = country;
   }
+
+  @Override
+  public String toString() {
+    return "ShortURL{" +
+            "hash='" + hash + '\'' +
+            ", target='" + target + '\'' +
+            ", uri=" + uri +
+            ", sponsor='" + sponsor + '\'' +
+            ", created=" + created +
+            ", expiration=" + expiration +
+            ", owner=" + owner +
+            ", mode=" + mode +
+            ", safe=" + safe +
+            ", ip='" + ip + '\'' +
+            ", country='" + country + '\'' +
+            ", clicks=" + clicks +
+            '}';
+  }
 }

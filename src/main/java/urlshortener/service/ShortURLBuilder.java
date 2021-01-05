@@ -45,10 +45,10 @@ public class ShortURLBuilder {
     );
   }
 
-  ShortURLBuilder target(String url) {
+  ShortURLBuilder target(String url, String owner) {
     target = url;
     //noinspection UnstableApiUsage
-    hash = murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+    hash = murmur3_32().hashString(url + owner, StandardCharsets.UTF_8).toString();
     return this;
   }
 

@@ -49,15 +49,19 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public ShortURL save(ShortURL su) {
     try {
-      System.out.println("9999999999999999999999999999999999999999999999 " + su.getSafe());
-      jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
+      System.out.println(su.toString());
+      int result = jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
           su.getHash(), su.getTarget(), su.getSponsor(),
           su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), su.getSafe(),
           su.getIP(), su.getCountry());
+      System.out.println("9999999999999999999999999999999999999999999999 " + result);
+
     } catch (DuplicateKeyException e) {
+      e.printStackTrace();
       log.debug("When insert for key {}", su.getHash(), e);
       return su;
     } catch (Exception e) {
+      e.printStackTrace();
       log.debug("When insert", e);
       return null;
     }

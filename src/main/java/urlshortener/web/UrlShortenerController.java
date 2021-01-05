@@ -36,6 +36,7 @@ import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
+import urlshortener.repository.impl.MetricsRepository;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.socket_message.ValidationMessage;
@@ -51,6 +52,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   @Autowired
   private AuthenticationManager authenticationManager;
+
+  @Autowired
+  private MetricsRepository metricsRepository;
 
   @Autowired
   private JWTTokenUtil jwtTokenUtil;
@@ -175,11 +179,21 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           }),
   })
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
+
+
     String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
     User u = secureUserService.getUser(username);
+    if(metricsRepository.contains(u.getId())){
+      System.out.println("AQUI");
 
-    List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-    return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
+      return new ResponseEntity<>(shortUrlService.metricToJSON(metricsRepository.getMetrics(u.getId())), HttpStatus.OK);
+    }else{
+      System.out.println("ALLÁ");
+
+      List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
+      taskQueueService.publishMetricJob(u.getId());
+      return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
+    }
   }
 
 
