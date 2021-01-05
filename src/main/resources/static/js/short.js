@@ -95,7 +95,7 @@ function dealMessageFromServer(msg) {
 /**
  * Add a short url receive by message in the table of the GUI.
  * @param msg: message with the data of the short url
- */
+ *//*
 function appendRow(msg){
         var markup
         markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
@@ -103,6 +103,21 @@ function appendRow(msg){
         var tableBody = $("tbody");
         tableBody.append(markup);
         $("#feedback").empty();
+}*/
+
+function appendRow(msg){
+    alert(JSON.stringify(msg));
+    var markup
+    if(msg.valid){
+        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+            "<td><a href=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
+    }else{
+        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+            "<td><a id=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
+    }
+    var tableBody = $("tbody");
+    tableBody.append(markup);
+    $("#feedback").empty();
 }
 
 /**
@@ -126,7 +141,6 @@ function getShortURLFromCSV() {
  * @param text content of the file to crate
  */
 function download(filename, text) {
-    alert("DESCARGANDO " + text);
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);

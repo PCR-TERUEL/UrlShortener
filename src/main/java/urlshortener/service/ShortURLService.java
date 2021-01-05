@@ -48,6 +48,7 @@ public class ShortURLService {
         shortJSON.put( "uri", "http://" + UrlShortenerController.HOST + "/r/" + su.getHash());
         shortJSON.put("target", su.getTarget());
         shortJSON.put("clicks", su.getClicks());
+        shortJSON.put("valid", su.getSafe());
         jArray.add(shortJSON);
       }
       jObject.put("urlList", jArray);
@@ -85,6 +86,7 @@ public class ShortURLService {
   }
 
   public boolean isValidated(String id) {
+//    System.out.println("---------------------" + findByKey(id).isValidated());
     return findByKey(id) != null && findByKey(id).isValidated();
   }
   public boolean validate(String url, boolean value){

@@ -14,7 +14,7 @@ CREATE TABLE SHORTURL
     SPONSOR VARCHAR(1024),           -- Sponsor URL
     CREATED TIMESTAMP,               -- Creation date
     EXPIRATION DATE,                 -- Expiration date
-    OWNER   BIGINT,           -- User id
+    OWNER   BIGINT,                  -- User id
     MODE    INTEGER,                 -- Redirect mode
     SAFE    BOOLEAN DEFAULT false,                 -- Safe target
     IP      VARCHAR(20),             -- IP
@@ -26,7 +26,7 @@ CREATE TABLE SHORTURL
 CREATE TABLE CLICK
 (
     ID       BIGINT IDENTITY,                                             -- KEY
-    HASH     VARCHAR(10) NOT NULL FOREIGN KEY REFERENCES SHORTURL (HASH), -- Foreing key
+    HASH     VARCHAR(10), -- Foreing key
     CREATED  TIMESTAMP,                                                   -- Creation date
     REFERRER VARCHAR(1024),                                               -- Traffic origin
     BROWSER  VARCHAR(50),                                                 -- Browser
@@ -51,8 +51,9 @@ CREATE TABLE ROLE
     ROLE_NAME VARCHAR(20)
 );
 
-ALTER TABLE SHORTURL ADD FOREIGN KEY (OWNER) REFERENCES USER (ID);
-ALTER TABLE USER ADD FOREIGN KEY (ROLE) REFERENCES ROLE (ID);
+ALTER TABLE SHORTURL ADD FOREIGN KEY (OWNER) REFERENCES USER (ID) ON DELETE CASCADE;
+ALTER TABLE USER ADD FOREIGN KEY (ROLE) REFERENCES ROLE (ID) ON DELETE CASCADE;
+ALTER TABLE CLICK ADD FOREIGN KEY (HASH) REFERENCES SHORTURL (HASH) ON DELETE CASCADE;
 INSERT INTO ROLE(ROLE_NAME) VALUES ('ROLE_ADMIN');
 INSERT INTO ROLE(ROLE_NAME) VALUES ('ROLE_USER');
 INSERT INTO USER(USERNAME, PASSWORD, ROLE) VALUES ('admin','1234',0);

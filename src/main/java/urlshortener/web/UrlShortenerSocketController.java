@@ -60,8 +60,7 @@ public class UrlShortenerSocketController {
             ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
                     String.valueOf(u.getId()), "", numMonth);
             su.setUri(new URI("http://" + UrlShortenerController.HOST + "/r/" + su.getHash()));
-            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false,
-                    petition.isDocumentCsv(), petition.getIdToken());
+            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false, petition.getIdToken());
 
             System.out.println(su.getUri().toString());
             taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
@@ -71,7 +70,6 @@ public class UrlShortenerSocketController {
         }catch (Exception e){
             e.printStackTrace();
             ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(null, true,
-                    petition.isDocumentCsv(),
                     petition.getIdToken());
             return outMessage;
         }
