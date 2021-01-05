@@ -8,6 +8,11 @@ import urlshortener.service.Tasks.MetricsResponseListener;
 import urlshortener.service.Tasks.TaskQueueService;
 import urlshortener.service.Tasks.ValidationResponseListener;
 
+/**
+ * Rabbit configuration declarations
+ *
+ */
+
 @Configuration
 @ComponentScan("urlshortener.service")
 public class RabbitConfiguration {

@@ -29,6 +29,18 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
+    /**
+     * Filter all petitions to retrive a JSON Web Token to
+     * identify a user
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @throws ServletException
+     * @throws IOException
+     */
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -53,7 +65,14 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     }
 
 
-
+    /**
+     * Check that the JWT is valid: is not expired
+     * and is attached to an user
+     *
+     * @param username
+     * @param jwtToken
+     * @param request
+     */
 
     private void validateToken(String username, String jwtToken, HttpServletRequest request) {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -69,6 +88,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                 // After setting the Authentication in the context, we specify
                 // that the current user is authenticated. So it passes the
                 // Spring Security Configurations successfully.
+                System.out.println("User authorized with role: " + userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }

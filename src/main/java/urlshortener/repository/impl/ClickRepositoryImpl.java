@@ -85,21 +85,6 @@ public class ClickRepositoryImpl implements ClickRepository {
     return cl;
   }
 
-  @Override
-  public void update(Click cl) {
-    log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getId(), cl.getBrowser(), cl.getPlatform(),
-        cl.getCreated());
-    try {
-      jdbc.update(
-          "update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
-          cl.getHash(), cl.getCreated(), cl.getReferrer(),
-          cl.getBrowser(), cl.getPlatform(), cl.getIp(),
-          cl.getCountry(), cl.getId());
-
-    } catch (Exception e) {
-      log.info("When update for id " + cl.getId(), e);
-    }
-  }
 
   @Override
   public void delete(Long id) {

@@ -13,11 +13,17 @@ public class ClickService {
       .getLogger(ClickService.class);
 
   private final ClickRepository clickRepository;
-
   public ClickService(ClickRepository clickRepository) {
     this.clickRepository = clickRepository;
   }
 
+
+  /**
+   * Create a Click and tell the repository to save it
+   *
+   * @param hash
+   * @param ip
+   */
   public void saveClick(String hash, String ip) {
     Click cl = ClickBuilder.newInstance().hash(hash).createdNow().ip(ip).build();
     cl = clickRepository.save(cl);

@@ -11,6 +11,11 @@ import java.util.function.Function;
 import org.springframework.http.HttpStatus;
 import urlshortener.domain.ShortURL;
 
+/**
+ * Build a ShortURL object by given parameters
+ *
+ */
+
 public class ShortURLBuilder {
 
   private String hash;

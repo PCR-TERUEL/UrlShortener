@@ -26,6 +26,15 @@ public class SecureUserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * Creates a UserDetails based on a User, so it can be handled
+     * by Spring Security
+     *
+     * @param username
+     * @return UserDetails
+     * @throws UsernameNotFoundException
+     */
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         System.out.println("Hello, Spring Security! let me check: " + username);
@@ -48,6 +57,13 @@ public class SecureUserService implements UserDetailsService {
 
     }
 
+    /**
+     * Retreive the role of an user (User/Admin)
+     *
+     * @param u
+     * @return ADMIN or USER
+     */
+
     private String getRoleName(urlshortener.domain.User u) {
         if (u.getRoleId() == Role.ROLE_ADMIN) {
             return "ADMIN";
@@ -55,6 +71,14 @@ public class SecureUserService implements UserDetailsService {
             return "USER";
         }
     }
+
+    /**
+     * Create a User and tell repository to save it
+     *
+     * @param username
+     * @param password
+     * @return
+     */
 
     public boolean save(String username, String password) {
         urlshortener.domain.User u = SecureUserBuilder.newInstance()
@@ -67,13 +91,32 @@ public class SecureUserService implements UserDetailsService {
         return userRepository.save(u);
     }
 
+    /**
+     * Get User from a username
+     *
+     * @param username
+     * @return User
+     */
     public urlshortener.domain.User getUser(String username) {
         return userRepository.getUser(username);
     }
 
+    /**
+     * Get a list of all users
+     *
+     * @return list of users
+     */
+
     public List<urlshortener.domain.User> getUsers() {
         return userRepository.getUsers();
     }
+
+    /**
+     * Delete a user
+     *
+     * @param id
+     * @return deleted?
+     */
 
     public boolean deleteUser(int id) {
         return userRepository.deleteById(id);

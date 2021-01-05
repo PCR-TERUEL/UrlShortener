@@ -1,6 +1,10 @@
 package urlshortener.service;
-
 import urlshortener.domain.User;
+
+/**
+ * Build a User object by the given parameters
+ *
+ */
 
 public class SecureUserBuilder {
   private String id;

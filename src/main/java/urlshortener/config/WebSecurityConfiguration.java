@@ -44,13 +44,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    /**
+     * Declare URL permissions by roles, login handling
+     * and set JWT filter
+     *
+     * @param http
+     * @throws Exception
+     */
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
-        .antMatchers("/panel", "/logout").hasRole("USER")
+        .antMatchers("/panel", "/logout", "/users-information").hasAnyRole("USER", "ADMIN")
         .and()
-        .authorizeRequests().antMatchers("/user/{id}", "/users-information").hasRole("ADMIN")
+        .authorizeRequests().antMatchers("/user/{id}").hasRole("ADMIN")
         .and()
         .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll()
         .and().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
