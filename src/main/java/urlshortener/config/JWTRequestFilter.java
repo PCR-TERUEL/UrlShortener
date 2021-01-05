@@ -69,6 +69,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                 // After setting the Authentication in the context, we specify
                 // that the current user is authenticated. So it passes the
                 // Spring Security Configurations successfully.
+                System.out.println("User authorized with role: " + userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }

@@ -187,7 +187,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return new ModelAndView("forward:/error_no.html");
   }
 
-  @GetMapping(value = "/users-information")
+  @PostMapping(value = "/users-information")
   @Operation(summary = "Get all users information")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "All users info OK", content = {
@@ -195,6 +195,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           })
   })
   public ResponseEntity<?> getUsers() {
+
     return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
   }
 

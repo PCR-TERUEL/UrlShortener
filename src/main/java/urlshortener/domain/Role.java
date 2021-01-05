@@ -1,8 +1,8 @@
 package urlshortener.domain;
 
 public class Role {
-    public static final int ROLE_ADMIN = 0;
-    public static final int ROLE_USER = 1;
+    public static final int ROLE_ADMIN = 1;
+    public static final int ROLE_USER = 2;
     private int id;
     private String roleName;
 
