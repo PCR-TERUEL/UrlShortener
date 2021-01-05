@@ -106,7 +106,6 @@ function appendRow(msg){
 }*/
 
 function appendRow(msg){
-    alert(JSON.stringify(msg));
     var markup
     if(msg.valid){
         markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +

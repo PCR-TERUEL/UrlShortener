@@ -90,10 +90,4 @@ public class UrlShortenerSocketController {
                 accessor.getMessageHeaders());
         shortUrlService.validate(url, valid);
     }
-    /* Para el metodo de enviar mensajes sin usar el return
-    SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
-        accessor.setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
-        simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/short_url", outMessage,
-            accessor.getMessageHeaders());*/
-
 }
