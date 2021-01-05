@@ -28,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public boolean save(User u) {
     try {
-      jdbc.update("INSERT INTO USER(USERNAME, PASSWORD, ROLE) VALUES (?,?,?)",
+      jdbc.update("INSERT INTO user(USERNAME, PASSWORD, ROLE) VALUES (?,?,?)",
               u.getUsername(), u.getPassword(), 1);
       return true;
     }  catch (Exception e) {
@@ -70,17 +70,17 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public boolean exists(String userId) {
-    List<User> listUsers =  jdbc.query("SELECT * FROM USER WHERE ID = ?", new Object[] {userId}, rowMapper);
+    List<User> listUsers =  jdbc.query("SELECT * FROM user WHERE ID = ?", new Object[] {userId}, rowMapper);
     return listUsers.size() > 0;
   }
 
   @Override
   public List<User> getUsers() {
-    return jdbc.query("SELECT * FROM USER", rowMapper);
+    return jdbc.query("SELECT * FROM user", rowMapper);
   }
 
   @Override
   public boolean deleteById(int userId) {
-    return jdbc.update("DELETE FROM USER WHERE ID = ?", userId) == 1;
+    return jdbc.update("DELETE FROM user WHERE ID = ?", userId) == 1;
   }
 }

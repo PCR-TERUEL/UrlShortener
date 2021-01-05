@@ -50,11 +50,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests()
         .antMatchers("/panel", "/logout").hasRole("USER")
         .and()
-        .authorizeRequests().antMatchers("/delete").hasRole("ADMIN")
+        .authorizeRequests().antMatchers("/user/{id}", "/users-information").hasRole("ADMIN")
         .and()
         .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll()
         .and().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
-        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**", "/test",
+        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**", "/test", "/r/{id}",
         "/css/**", "/img/**", "/js/**", "/lib/**", "/images", "/v3/**").permitAll().anyRequest().authenticated()
         .and()
         .logout().addLogoutHandler(((request, response, auth) -> {

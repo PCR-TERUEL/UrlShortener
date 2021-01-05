@@ -1,6 +1,7 @@
 package urlshortener.repository.impl;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
@@ -108,9 +109,13 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     try {
       ShortURL shortURL = jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
               rowMapper, id);
-      System.out.println("Expiracion" + shortURL.getExpiration());
-      System.out.println("Actual" + new Date(0));
-      return shortURL.getExpiration().compareTo(new Date(0)) == 0 &&
+
+      SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+      java.util.Date actual = df.parse(shortURL.getExpiration().toString());
+      java.util.Date noExpired = df.parse(new Date(0).toString());
+      System.out.println("Expiracion" + shortURL.getExpiration().getTime());
+      System.out.println("Actual" + System.currentTimeMillis());
+      return !actual.equals(noExpired) &&
               shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {
       log.debug("When select for key {}", id, e);
@@ -159,7 +164,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   }
 
   private Long countClicks(ShortURL su) {
-    return jdbc.query("SELECT count(*) FROM CLICK WHERE HASH = ?", new Object[] {su.getHash()},
+    return jdbc.query("SELECT count(*) FROM click WHERE HASH = ?", new Object[] {su.getHash()},
             rowMapperCount).get(0);
   }
 

@@ -54,16 +54,17 @@ public class ClickRepositoryImpl implements ClickRepository {
       jdbc.update(conn -> {
         PreparedStatement ps = conn
             .prepareStatement(
-                "INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO urlshortener.click" +
+                        "(REFERRER, BROWSER, PLATFORM, IP, COUNTRY, HASH) " +
+                        "VALUES(?,?,?,?,?,?);",
                 Statement.RETURN_GENERATED_KEYS);
-        ps.setNull(1, Types.BIGINT);
-        ps.setString(2, cl.getHash());
-        ps.setDate(3, cl.getCreated());
-        ps.setString(4, cl.getReferrer());
-        ps.setString(5, cl.getBrowser());
-        ps.setString(6, cl.getPlatform());
-        ps.setString(7, cl.getIp());
-        ps.setString(8, cl.getCountry());
+
+        ps.setString(1, cl.getReferrer());
+        ps.setString(2, cl.getBrowser());
+        ps.setString(3, cl.getPlatform());
+        ps.setString(4, cl.getIp());
+        ps.setString(5, cl.getCountry());
+        ps.setString(6, cl.getHash());
         return ps;
       }, holder);
       if (holder.getKey() != null) {
@@ -73,9 +74,11 @@ public class ClickRepositoryImpl implements ClickRepository {
         log.debug("Key from database is null");
       }
     } catch (DuplicateKeyException e) {
+      e.printStackTrace();
       log.debug("When insert for click with id " + cl.getId(), e);
       return cl;
     } catch (Exception e) {
+      e.printStackTrace();
       log.debug("When insert a click", e);
       return null;
     }
