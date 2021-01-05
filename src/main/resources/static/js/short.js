@@ -108,10 +108,10 @@ function appendRow(msg){
 function appendRow(msg){
     var markup
     if(msg.valid){
-        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+        markup = "<tr><td class=\"first-column\"><a href=" + msg.target+ ">" + msg.target +"</td>" +
             "<td><a href=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
     }else{
-        markup = "<tr><td class=\"first-column\"><a href=http://" + msg.target+ ">" + msg.target +"</td>" +
+        markup = "<tr><td class=\"first-column\"><a href=" + msg.target+ ">" + msg.target +"</td>" +
             "<td><a id=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
     }
     var tableBody = $("tbody");
