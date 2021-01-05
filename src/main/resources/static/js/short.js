@@ -157,7 +157,7 @@ function download(filename, text) {
  */
 function getData(){
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: URL_SERVER + "/userlinks",
         success: function (msg) {
             links = msg.urlList;
