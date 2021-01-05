@@ -135,6 +135,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       response.addCookie(new Cookie("username", username));
       return ResponseEntity.ok(new JWT(token));
     } catch (Exception e) {
+      e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }

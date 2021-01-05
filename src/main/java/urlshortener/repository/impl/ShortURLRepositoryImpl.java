@@ -159,7 +159,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   }
 
   private Long countClicks(ShortURL su) {
-    return jdbc.query("SELECT count(*) FROM CLICK WHERE HASH = ?", new Object[] {su.getHash()},
+    return jdbc.query("SELECT count(*) FROM click WHERE HASH = ?", new Object[] {su.getHash()},
             rowMapperCount).get(0);
   }
 
