@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
@@ -85,18 +86,21 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @GetMapping(value = "/r/{id:(?).*}")
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
+    JSONObject error = new JSONObject();
     ShortURL l = shortUrlService.findByKey(id);
     if (l != null) {
       if(shortUrlService.isExpired(id)) {
         shortUrlService.delete(l.getHash());
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        error.put("error", "limite temporal invalido");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
       } else if (!shortUrlService.isValidated(id)) {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
       clickService.saveClick(id, extractIP(request));
       return createSuccessfulRedirectToResponse(l);
     } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      error.put("error", "no existe la url acortada");
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
   }
@@ -163,7 +167,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
 
   @Async
-  @PostMapping(value = "/userlinks")
+  @GetMapping(value = "/userlinks")
   @Operation(summary = "Get all links of an user")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "201", description = "User registration OK", content = {
@@ -175,9 +179,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-    if(urlShort.size() > 0) {
-      System.out.println("--------------------------------> " + urlShort.get(0).getSafe());
-    }
     return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
   }
 
