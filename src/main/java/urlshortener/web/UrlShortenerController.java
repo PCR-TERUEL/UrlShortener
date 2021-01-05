@@ -68,6 +68,12 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return null;
   }
 
+  /**
+   * Map static content to root
+   *
+   * @param registry
+   */
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/static/**")
@@ -178,7 +184,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     User u = secureUserService.getUser(username);
 
     List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-    return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
+    return new ResponseEntity<>(urlShort, HttpStatus.OK);
   }
 
 

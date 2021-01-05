@@ -44,6 +44,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    /**
+     * Declare URL permissions by roles, login handling
+     * and set JWT filter
+     *
+     * @param http
+     * @throws Exception
+     */
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

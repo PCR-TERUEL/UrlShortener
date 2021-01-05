@@ -47,6 +47,12 @@ public class PersistenceConfiguration implements WebMvcConfigurer {
     return new UserRepositoryImpl(jdbc);
   }
 
+  /**
+   * Enable URL mapping for webjars
+   *
+   * @param registry
+   */
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     if (!registry.hasMappingForPattern("/webjars/**")) {
@@ -59,6 +65,12 @@ public class PersistenceConfiguration implements WebMvcConfigurer {
     }
   }
 
+  /**
+   * Enable URL mapping for static content
+   *
+   * @return
+   */
+
   @Bean
   public InternalResourceViewResolver internalResourceViewResolver() {
     InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
@@ -66,12 +78,24 @@ public class PersistenceConfiguration implements WebMvcConfigurer {
     return internalResourceViewResolver;
   }
 
+  /**
+   * Add URL mapping for some URL's (probably deprecated)
+   *
+   * @param registry
+   */
+
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
     registry.addViewController("/").setViewName("index");
     registry.addViewController("/panel").setViewName("panel");
     registry.addViewController("/error").setViewName("error");
   }
+
+  /**
+   * Set legacy cookie processor for cookie handling
+   *
+   * @return
+   */
 
   @Bean
   public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {

@@ -3,6 +3,11 @@ package urlshortener.service;
 import java.sql.Date;
 import urlshortener.domain.Click;
 
+/**
+ * Builds a Click object by the given parameters
+ *
+ */
+
 public class ClickBuilder {
 
   private String hash;

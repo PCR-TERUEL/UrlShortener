@@ -19,14 +19,28 @@ public class ShortURLService {
 
   private final ShortURLRepository shortURLRepository;
 
+
   public ShortURLService(ShortURLRepository shortURLRepository) {
     this.shortURLRepository = shortURLRepository;
   }
 
+  /**
+   * Get a ShortURL from id
+   *
+   * @param id
+   * @return ShortURL
+   */
   public ShortURL findByKey(String id) {
     return shortURLRepository.findByKey(id);
   }
 
+  /**
+   * Retrive a list of ShortURL's of an user
+   *
+   * @param userId
+   * @return List of urls
+   * @throws URISyntaxException
+   */
   public List<ShortURL> findByUser(String userId) throws URISyntaxException {
     List<ShortURL> shortURLS = shortURLRepository.findByUser(userId);
 
@@ -36,28 +50,7 @@ public class ShortURLService {
      return shortURLRepository.findByUser(userId);
   }
 
-  public JSONObject toJson(List<ShortURL> shortList) {
-    JSONObject jObject = new JSONObject();
 
-    try
-    {
-      JSONArray jArray = new JSONArray();
-      for (ShortURL su : shortList)
-      {
-        JSONObject shortJSON = new JSONObject();
-        shortJSON.put( "uri", "http://" + UrlShortenerController.HOST + "/r/" + su.getHash());
-        shortJSON.put("target", su.getTarget());
-        shortJSON.put("clicks", su.getClicks());
-        shortJSON.put("valid", su.getSafe());
-        jArray.add(shortJSON);
-      }
-      jObject.put("urlList", jArray);
-      return jObject;
-    } catch (Exception e) {
-      return null;
-    }
-
-  }
 
   public boolean isExpired(String id){
     return shortURLRepository.isExpired(id);
@@ -67,8 +60,18 @@ public class ShortURLService {
     shortURLRepository.delete(id);
   }
 
-  public ShortURL save(String url, String sponsor, String owner, String ip, int numMonth) {
+  /**
+   * Save a ShortURL and tell the repository to save it
+   *
+   * @param url
+   * @param sponsor
+   * @param owner
+   * @param ip
+   * @param numMonth
+   * @return ShortURL
+   */
 
+  public ShortURL save(String url, String sponsor, String owner, String ip, int numMonth) {
     ShortURL su = ShortURLBuilder.newInstance()
         .target(url)
         .uri((String hash) -> linkTo(methodOn(UrlShortenerController.class).redirectTo(hash, null)).toUri())
@@ -85,10 +88,18 @@ public class ShortURLService {
     return shortURLRepository.save(su);
   }
 
+  /**
+   * Check if the ShortURL is validated
+   *
+   * @param id
+   * @return
+   */
   public boolean isValidated(String id) {
 //    System.out.println("---------------------" + findByKey(id).isValidated());
     return findByKey(id) != null && findByKey(id).isValidated();
   }
+
+
   public boolean validate(String url, boolean value){
     List<ShortURL> urls = shortURLRepository.findByTarget(url);
     if(urls.size() == 0)

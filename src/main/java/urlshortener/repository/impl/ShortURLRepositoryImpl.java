@@ -35,6 +35,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     this.jdbc = jdbc;
   }
 
+
+
   @Override
   public ShortURL findByKey(String id) {
     try {
@@ -46,10 +48,10 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     }
   }
 
+
   @Override
   public ShortURL save(ShortURL su) {
     try {
-      System.out.println("9999999999999999999999999999999999999999999999 " + su.getSafe());
       jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
           su.getHash(), su.getTarget(), su.getSponsor(),
           su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), su.getSafe(),
@@ -81,6 +83,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     }
   }
 
+
+
   @Override
   public void update(ShortURL su) {
     try {
@@ -95,6 +99,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     }
   }
 
+
   @Override
   public void delete(String hash) {
     try {
@@ -103,6 +108,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
       log.debug("When delete for hash {}", hash, e);
     }
   }
+
+
 
   @Override
   public boolean isExpired(String id) {
@@ -123,6 +130,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     }
   }
 
+
   @Override
   public Long count() {
     try {
@@ -133,6 +141,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     }
     return -1L;
   }
+
+
 
   @Override
   public List<ShortURL> list(Long limit, Long offset) {

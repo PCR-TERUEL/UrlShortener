@@ -12,6 +12,11 @@ public class URLValidatorService {
         this.url = url;
     }
 
+    /**
+     * Check if a URL is reachable and returns 200
+     *
+     * @return valid?
+     */
     public boolean isValid() {
         UrlValidator urlValidator = new UrlValidator(new String[] {"http",
                 "https"});
