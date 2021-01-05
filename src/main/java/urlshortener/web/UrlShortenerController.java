@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.models.Model;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +36,6 @@ import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
-import urlshortener.socket_message.ValidationMessage;
 
 @RestController
 public class UrlShortenerController implements WebMvcConfigurer, ErrorController {
@@ -82,6 +80,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           @ApiResponse(responseCode = "400", description = "URL is not validated yet", content = @Content),
           @ApiResponse(responseCode = "307", description = "Redirect OK")
   })
+
   @GetMapping(value = "/r/{id:(?).*}")
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
