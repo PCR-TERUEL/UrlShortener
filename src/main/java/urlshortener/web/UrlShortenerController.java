@@ -196,7 +196,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           })
   })
   public ResponseEntity<?> getUsers() {
-    System.out.println("UNO");
     return new ResponseEntity<>(secureUserService.getUsers(), HttpStatus.OK);
   }
 

@@ -15,7 +15,7 @@ public class MetricsResponseListener {
     @RabbitHandler
     public void receive(String in) {
         System.out.println(" [x] Received Metric'" + in + "'");
-        JSONObject employeeObject = (JSONObject) employee.get("employee");
+       // JSONObject employeeObject = (JSONObject) employee.get("employee");
 
 
         String message[] = in.split(TaskQueueService.SEPARATOR);
