@@ -1,13 +1,13 @@
 package urlshortener.socket_message;
 
-public class ShorUrlPetitionMessage {
+public class ShortUrlPetitionMessage {
     private String url;
     private String sponsor;
     private String idToken;
     private String numMonth;
     private boolean documentCsv;
 
-    public ShorUrlPetitionMessage(String url, String idToken, Boolean documentCsv) {
+    public ShortUrlPetitionMessage(String url, String idToken, Boolean documentCsv) {
         this.url = url;
         this.sponsor = "";
         this.idToken = idToken;
@@ -15,7 +15,7 @@ public class ShorUrlPetitionMessage {
         this.numMonth = "-1";
     }
 
-    public ShorUrlPetitionMessage(String url, String idToken, Boolean documentCsv, String numMonth) {
+    public ShortUrlPetitionMessage(String url, String idToken, Boolean documentCsv, String numMonth) {
         this.url = url;
         this.sponsor = "";
         this.idToken = idToken;
@@ -23,7 +23,7 @@ public class ShorUrlPetitionMessage {
         this.numMonth = numMonth;
     }
 
-    public ShorUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv){
+    public ShortUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv){
         this.url = url;
         this.sponsor = sponsor;
         this.idToken = idToken;
@@ -31,7 +31,7 @@ public class ShorUrlPetitionMessage {
         this.numMonth = "-1";
     }
 
-    public ShorUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv, String numMonth){
+    public ShortUrlPetitionMessage(String url, String sponsor, String idToken, boolean documentCsv, String numMonth){
         this.url = url;
         this.sponsor = sponsor;
         this.idToken = idToken;
@@ -39,7 +39,7 @@ public class ShorUrlPetitionMessage {
         this.numMonth = numMonth;
     }
 
-    public ShorUrlPetitionMessage() {
+    public ShortUrlPetitionMessage() {
     }
 
     public String getUrl() {
