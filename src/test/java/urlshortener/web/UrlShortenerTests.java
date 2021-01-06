@@ -4,12 +4,12 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static urlshortener.fixtures.ShortURLFixture.someUrl;
 
 
@@ -19,20 +19,27 @@ import java.util.Calendar;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import urlshortener.Application;
 import urlshortener.config.JWTTokenUtil;
@@ -44,172 +51,55 @@ import urlshortener.service.ClickService;
 import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
 
-public class UrlShortenerTests {
+  @RunWith(SpringRunner.class)
+  @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+  public class UrlShortenerTests {
 
-  private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext context;
 
-  @Mock
-  private ShortURLService shortUrlService;
+    private MockMvc mvc;
 
-  @Mock
-  private SecureUserService userService;
-
-  @Mock
-  private JWTTokenUtil jwtTokenUtil;
-
-  @InjectMocks
-  private UrlShortenerController urlShortener;
-
+    @Before
+    public void setup() {
+      mvc = MockMvcBuilders
+              .webAppContextSetup(context)
+              .apply(springSecurity())
+              .build();
+    }
 
 
-  @Before
-  public void setup() {
-    MockitoAnnotations.initMocks(this);
-    this.mockMvc = MockMvcBuilders.standaloneSetup(urlShortener).build();
+    @WithMockUser("spring")
+    @Test
+    public void givenAuthRequestOnPrivateService_shouldSucceedWith200() throws Exception {
+      mvc.perform(get("/private/hello").contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk());
+    }
+
+    @WithMockUser("user")
+    @Test
+    public void thatDoSomethingPlease() throws Exception {
+      String accessToken = obtainAccessToken("user", "1234");
+      mvc.perform(get("/userlinks").header("Authorization", "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk());
+    }
+
+    private String obtainAccessToken(String username, String password) throws Exception {
+
+      MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+      params.add("username", username);
+      params.add("password", password);
+
+      ResultActions result
+              = mvc.perform(post("/authenticate")
+              .params(params)
+              .accept("application/json;charset=UTF-8"))
+              .andExpect(status().isOk())
+              .andExpect(content().contentType("application/json;charset=UTF-8"));
+
+      String resultString = result.andReturn().getResponse().getContentAsString();
+
+      JacksonJsonParser jsonParser = new JacksonJsonParser();
+      return jsonParser.parseMap(resultString).get("token").toString();
+    }
   }
-
-  @Test
-  public void thatRegisterIsSuccessful() throws Exception {
-    configureUserSave("user", "1234");
-
-    mockMvc.perform(post("/singup").contentType(MediaType.APPLICATION_JSON)
-            .param("username","user")
-            .param("password","1234"))
-            .andDo(print())
-            .andExpect(status().isCreated());
-  }
-
-  @Test
-  public void thatAuthenticationIsSuccessful() throws Exception {
-    MvcResult result = mockMvc.perform(post("/authenticate").contentType(MediaType.APPLICATION_JSON)
-            .param("username","user")
-            .param("password","1234"))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("token", is(notNullValue()))).andReturn();
-  }
-
-  @Test
-  public void thatShortenerCreatesARedirectIfTheURLisOK() throws Exception {
-    configureUrlSave(null);
-
-    mockMvc.perform(post("/link")
-            .param("url", "http://example.com/")
-            .param("uuid","0"))
-            .andDo(print())
-            .andExpect(redirectedUrl("http://localhost/f684a3c4"))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.hash", is("f684a3c4")))
-            .andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
-            .andExpect(jsonPath("$.target", is("http://example.com/")))
-            .andExpect(jsonPath("$.sponsor", is(nullValue())));
-  }
-
-  @Test
-  public void thatDoSomethingPlease() throws Exception {
-    configureUserLinks("user");
-
-    mockMvc.perform(post("/userlinks"));
-  }
-
-/*
-  @Test
-  public void thatShortenerCreatesARedirectIfTheURLisOK2() throws Exception {
-    configureUrlSave(null);
-
-    mockMvc.perform(post("/link")
-            .param("url", "http://example.com/"))
-            .andDo(print())
-            .andExpect(redirectedUrl("http://localhost/f684a3c4"))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.hash", is("f684a3c4")))
-            .andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
-            .andExpect(jsonPath("$.target", is("http://example.com/")))
-            .andExpect(jsonPath("$.sponsor", is(nullValue())));
-  }
-
-
-  @Test
-  public void thatRedirectToReturnsTemporaryRedirectIfKeyExists()
-      throws Exception {
-    when(shortUrlService.findByKey("someKey")).thenReturn(someUrl());
-
-    mockMvc.perform(get("/{id}", "someKey")).andDo(print())
-        .andExpect(status().isTemporaryRedirect())
-        .andExpect(redirectedUrl("http://example.com/"));
-  }
-
-  @Test
-  public void thatRedirecToReturnsNotFoundIdIfKeyDoesNotExist()
-      throws Exception {
-    when(shortUrlService.findByKey("someKey")).thenReturn(null);
-
-    mockMvc.perform(get("/{id}", "someKey")).andDo(print())
-        .andExpect(status().isNotFound());
-  }
-
-
-    mockMvc.perform(
-        post("/link").param("url", "http://example.com/").param(
-            "sponsor", "http://sponsor.com/").param("uuid","0")).andDo(print())
-        .andExpect(redirectedUrl("http://localhost/f684a3c4"))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.hash", is("f684a3c4")))
-        .andExpect(jsonPath("$.uri", is("http://localhost/f684a3c4")))
-        .andExpect(jsonPath("$.target", is("http://example.com/")))
-        .andExpect(jsonPath("$.sponsor", is("http://sponsor.com/")));
-  }
-
-  @Test
-  public void thatShortenerFailsIfTheURLisWrong() throws Exception {
-    configureUrlSave(null);
-
-    mockMvc.perform(post("/link").param("url", "someKey")).andDo(print())
-        .andExpect(status().isBadRequest());
-  }
-
-  @Test
-  public void thatShortenerFailsIfTheRepositoryReturnsNull() throws Exception {
-    when(shortUrlService.save(any(String.class), any(String.class), any(String.class), any(String.class)))
-        .thenReturn(null);
-
-    mockMvc.perform(post("/link").param("url", "someKey")).andDo(print())
-        .andExpect(status().isBadRequest());
-  }
-*/
-
-
-
-  private void configureUrlSave(String sponsor) {
-    when(shortUrlService.save(any(),  any(), any(), any(), any()))
-        .then((Answer<ShortURL>) invocation -> new ShortURL(
-            "f684a3c4",
-            "http://example.com/",
-            URI.create("http://localhost/f684a3c4"),
-            sponsor,
-            new Date(System.currentTimeMillis()),
-            getExpirationDate(),
-            null,
-            0,
-            false,
-            null,
-            null));
-  }
-
-  private void configureUserSave(String username, String password) {
-    when(userService.save(any(),  any()))
-            .then((Answer<Boolean>) invocation -> true);
-  }
-
-
-  private void configureUserLinks(String username) {
-    when(jwtTokenUtil.getUsernameFromToken(any()))
-            .then((Answer<String>) invocation -> "user");
-  }
-
-  private Date getExpirationDate() {
-    Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.MONTH, 1);
-    return new Date(calendar.getTimeInMillis());
-  }
-}
