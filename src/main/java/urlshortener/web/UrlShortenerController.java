@@ -95,21 +95,18 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @GetMapping(value = "/r/{id:(?).*}")
   public ResponseEntity<?> redirectTo(@PathVariable String id,
                                       HttpServletRequest request) {
-    JSONObject error = new JSONObject();
     ShortURL l = shortUrlService.findByKey(id);
     if (l != null) {
       if(shortUrlService.isExpired(id)) {
         shortUrlService.delete(l.getHash());
-        error.put("error", "limite temporal invalido");
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Limite temporal invalido", HttpStatus.NOT_FOUND);
       } else if (!shortUrlService.isValidated(id)) {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
       }
       clickService.saveClick(id, extractIP(request));
       return createSuccessfulRedirectToResponse(l);
     } else {
-      error.put("error", "no existe la url acortada");
-      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>("No existe la URL acortada", HttpStatus.NOT_FOUND);
     }
 
   }
@@ -197,7 +194,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
       List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
       taskQueueService.publishMetricJob(u.getId());
-      return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
+      return new ResponseEntity<>(urlShort, HttpStatus.OK);
     }
   }
 

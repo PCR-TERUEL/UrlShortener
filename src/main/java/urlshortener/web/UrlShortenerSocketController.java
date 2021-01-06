@@ -14,13 +14,11 @@ import urlshortener.domain.User;
 import urlshortener.service.SecureUserService;
 import urlshortener.service.ShortURLService;
 import urlshortener.service.Tasks.TaskQueueService;
-import urlshortener.socket_message.ShorUrlPetitionMessage;
+import urlshortener.socket_message.ShortUrlPetitionMessage;
 import urlshortener.socket_message.ShortUrlResponseMessage;
 import urlshortener.socket_message.ValidationMessage;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.Principal;
 
 @Controller
 public class UrlShortenerSocketController {
@@ -44,7 +42,7 @@ public class UrlShortenerSocketController {
     @Async
     @MessageMapping("/link")
     @SendToUser("/url_shortener/short_url")
-    public ShortUrlResponseMessage shortener(ShorUrlPetitionMessage petition,
+    public ShortUrlResponseMessage shortener(ShortUrlPetitionMessage petition,
                                              @Header("simpSessionId") String sessionId) {
         try {
             int numMonth;
@@ -68,7 +66,8 @@ public class UrlShortenerSocketController {
 
             return outMessage;
         }catch (Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Error");
             ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(null, true,
                     petition.getIdToken());
             return outMessage;
