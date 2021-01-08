@@ -41,18 +41,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
-import urlshortener.Application;
-import urlshortener.config.JWTTokenUtil;
-import urlshortener.config.WebSecurityConfiguration;
-import urlshortener.domain.JWT;
-import urlshortener.domain.ShortURL;
-import urlshortener.domain.User;
-import urlshortener.service.ClickService;
-import urlshortener.service.SecureUserService;
-import urlshortener.service.ShortURLService;
 
   @RunWith(SpringRunner.class)
-  @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+  @SpringBootTest
   public class UrlShortenerTests {
 
     @Autowired
@@ -69,18 +60,20 @@ import urlshortener.service.ShortURLService;
     }
 
 
-    @WithMockUser("spring")
-    @Test
-    public void givenAuthRequestOnPrivateService_shouldSucceedWith200() throws Exception {
-      mvc.perform(get("/private/hello").contentType(MediaType.APPLICATION_JSON))
-              .andExpect(status().isOk());
-    }
 
     @WithMockUser("user")
     @Test
     public void thatDoSomethingPlease() throws Exception {
       String accessToken = obtainAccessToken("user", "1234");
       mvc.perform(get("/userlinks").header("Authorization", "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk());
+    }
+
+    @WithMockUser("user")
+    @Test
+    public void thatDoesSomethingElse() throws Exception {
+      String accessToken = obtainAccessToken("user", "1234");
+      mvc.perform(get("/users-information").header("Authorization", "Bearer " + accessToken).contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk());
     }
 

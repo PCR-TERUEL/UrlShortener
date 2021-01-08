@@ -136,8 +136,9 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
                                                      HttpServletResponse response)  {
 
     try {
-      authenticate(username, password);
-      UserDetails userDetails = secureUserService.loadUserByUsername(username);
+      Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+      SecurityContextHolder.getContext().setAuthentication(auth);
+      UserDetails userDetails = (UserDetails) auth.getPrincipal();
       String token = jwtTokenUtil.generateToken(userDetails);
       response.addCookie(new Cookie("token", "Bearer " + token));
       response.addCookie(new Cookie("username", username));
@@ -183,14 +184,14 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
 
 
-    String username = jwtTokenUtil.getUsernameFromToken(jwtTokenUtil.getRequestToken(request));
-    User u = secureUserService.getUser(username);
+    UserDetails ud = (UserDetails) ((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+    User u = secureUserService.getUser(ud.getUsername());
     if(metricsRepository.contains(u.getId())){
-      System.out.println("AQUI");
+      System.out.println("Getting from metrics");
 
       return new ResponseEntity<>(shortUrlService.metricToJSON(metricsRepository.getMetrics(u.getId())), HttpStatus.OK);
     }else{
-      System.out.println("ALLÁ");
+      System.out.println("Getting from db");
 
       List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
       taskQueueService.publishMetricJob(u.getId());
@@ -246,11 +247,4 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     return null;
   }
 
-  private void authenticate(String username, String password) throws Exception {
-    try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-    } catch (BadCredentialsException e) {
-      throw new Exception("INVALID_CREDENTIALS", e);
-    }
-  }
 }
