@@ -53,14 +53,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
-        .antMatchers("/panel", "/logout", "/users-information").hasAnyRole("USER", "ADMIN")
+        .antMatchers("/panel", "/logout", "/users-information", "/userlinks").hasAnyRole("USER", "ADMIN")
         .and()
-        .authorizeRequests().antMatchers("/user/{id}").hasRole("ADMIN")
+        .authorizeRequests().antMatchers("/user/{*}").hasRole("ADMIN")
         .and()
         .formLogin().loginPage("/login").defaultSuccessUrl("/panel").permitAll()
-        .and().authorizeRequests().antMatchers("/authenticate", "/", "/index", "/login",
-        "/singup", "/error", "error_no", "*.html", "/apidoc_files/**", "/contactform/**", "/test", "/r/{id}",
-        "/css/**", "/img/**", "/js/**", "/lib/**", "/images", "/v3/**").permitAll().anyRequest().authenticated()
+        .and().authorizeRequests().anyRequest().permitAll()
         .and()
         .logout().addLogoutHandler(((request, response, auth) -> {
             for (Cookie cookie : request.getCookies()) {
@@ -70,8 +68,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 response.addCookie(cookieToDelete);
             }
         })).logoutUrl("/logout").logoutSuccessUrl("/")
-        .and()
-        .exceptionHandling().accessDeniedPage("/login?=unauthorized")
         .and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

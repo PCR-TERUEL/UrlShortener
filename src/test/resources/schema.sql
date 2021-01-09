@@ -1,6 +1,6 @@
-DROP DATABASE urlshortener;
-CREATE DATABASE urlshortener;
-USE urlshortener;
+DROP DATABASE urlshortener_test;
+CREATE DATABASE urlshortener_test;
+USE urlshortener_test;
 
 CREATE TABLE IF NOT EXISTS role
 (
@@ -52,8 +52,7 @@ INSERT INTO role(ROLE_NAME) VALUES ('ROLE_USER');
 INSERT INTO user(USERNAME, PASSWORD, ROLE) VALUES ('admin','1234',1);
 INSERT INTO user(USERNAME, PASSWORD, ROLE) VALUES ('user','1234',2);
 INSERT INTO shorturl (`HASH`, `TARGET`, `SPONSOR`, `CREATED`, `EXPIRATION`, `OWNER`, `MODE`, `SAFE`, `IP`, `COUNTRY`) VALUES
-('09bb6428', 'https://www.live.com', NULL, '2021-01-06 08:00:00', '1970-01-01', 2, 307, 1, '', NULL),
-('0b4f261e', 'https://www.reddit.com', NULL, '2021-01-06 08:00:00', '1970-01-01', 2, 307, 1, '', NULL);
+('09bb6428', 'https://www.live.com', NULL, '2021-01-06 08:00:00', '1970-01-01', 2, 307, 1, '', NULL);
 
 
 

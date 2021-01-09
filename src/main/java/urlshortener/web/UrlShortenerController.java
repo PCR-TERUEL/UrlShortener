@@ -82,7 +82,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/static/**")
             .addResourceLocations("classpath:/static");
-    //this.secureUserService = secureUserService;
   }
 
   @Operation(summary = "Redirect to correspondent URL by the given hash")
@@ -109,18 +108,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
       return new ResponseEntity<>("No existe la URL acortada", HttpStatus.NOT_FOUND);
     }
 
-  }
-
-
-  @Operation(summary = "Check if user is logged in and give correspondent html")
-  @GetMapping(value = "/login")
-  public ModelAndView login() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth.getPrincipal() instanceof  UserDetails) {
-      return new ModelAndView("redirect:/panel");
-    }
-
-    return new ModelAndView("forward:/userlogin.html");
   }
 
   @PostMapping(value = "/authenticate")
@@ -151,11 +138,11 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
 
   @PostMapping(value = "/singup")
-  @Operation(summary = "User sing up")
+  @Operation(summary = "Sing up a user")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "400", description = "Wrong parameters"),
-          @ApiResponse(responseCode = "226", description = "User already exists"),
-          @ApiResponse(responseCode = "201", description = "User registration OK"),
+          @ApiResponse(responseCode = "409", description = "Username already exists"),
+          @ApiResponse(responseCode = "201", description = "User registered successfully"),
   })
   public ResponseEntity<?> register(@RequestParam("username") String username,
                                     @RequestParam("password") String password) {
@@ -168,7 +155,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
     if (registered) {
       return new ResponseEntity<>(HttpStatus.CREATED);
     } else {
-      return new ResponseEntity<>(HttpStatus.IM_USED);
+      return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
   }
 
@@ -177,38 +164,33 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   @GetMapping(value = "/userlinks")
   @Operation(summary = "Get all links of an user")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "201", description = "User registration OK", content = {
+          @ApiResponse(responseCode = "200", description = "User links retrieved successfully", content = {
                   @Content(mediaType = "application/json", schema = @Schema(implementation = ShortURL.class))
           }),
   })
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
-
-
-    UserDetails ud = (UserDetails) ((UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+    UserDetails ud = (UserDetails) (SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
     User u = secureUserService.getUser(ud.getUsername());
+    /*
     if(metricsRepository.contains(u.getId())){
       System.out.println("Getting from metrics");
 
       return new ResponseEntity<>(shortUrlService.metricToJSON(metricsRepository.getMetrics(u.getId())), HttpStatus.OK);
     }else{
+     */
       System.out.println("Getting from db");
 
       List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-      taskQueueService.publishMetricJob(u.getId());
+      //taskQueueService.publishMetricJob(u.getId());
       return new ResponseEntity<>(urlShort, HttpStatus.OK);
-    }
+   // }
   }
 
-
-  @GetMapping("/error")
-  public ModelAndView error() {
-    return new ModelAndView("forward:/error_no.html");
-  }
 
   @PostMapping(value = "/users-information")
   @Operation(summary = "Get all users information")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "All users info OK", content = {
+          @ApiResponse(responseCode = "200", description = "All users retrieved successfully", content = {
                   @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))
           })
   })

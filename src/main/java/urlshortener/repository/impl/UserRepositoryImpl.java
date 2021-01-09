@@ -29,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
   public boolean save(User u) {
     try {
       jdbc.update("INSERT INTO user(USERNAME, PASSWORD, ROLE) VALUES (?,?,?)",
-              u.getUsername(), u.getPassword(), 1);
+              u.getUsername(), u.getPassword(), u.getRoleId());
       return true;
     }  catch (Exception e) {
       System.out.println(e);
