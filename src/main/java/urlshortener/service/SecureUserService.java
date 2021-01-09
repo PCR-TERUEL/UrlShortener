@@ -65,7 +65,6 @@ public class SecureUserService implements UserDetailsService {
      */
 
     private String getRoleName(urlshortener.domain.User u) {
-        System.out.println("ROLE OBTENIDO: " + u.getRoleId());
         if (u.getRoleId() == Role.ROLE_ADMIN) {
             return "ADMIN";
         } else {

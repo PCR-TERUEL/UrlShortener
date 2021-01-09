@@ -49,7 +49,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
   @Override
   public ShortURL save(ShortURL su) {
     try {
-      System.out.println(su.toString());
       jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?,?)",
           su.getHash(), su.getTarget(), su.getSponsor(),
           su.getCreated(), su.getExpiration(), su.getOwner(), su.getMode(), su.getSafe(),
@@ -80,20 +79,6 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     } catch (Exception e) {
       log.debug("When update", e);
       return null;
-    }
-  }
-
-  @Override
-  public void update(ShortURL su) {
-    try {
-
-      jdbc.update(
-          "update shorturl set target=?, sponsor=?, created=?, expiration=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
-          su.getTarget(), su.getSponsor(), su.getCreated(), su.getExpiration(),
-          su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
-          su.getCountry(), su.getHash());
-    } catch (Exception e) {
-      log.debug("When update for hash {}", su.getHash(), e);
     }
   }
 

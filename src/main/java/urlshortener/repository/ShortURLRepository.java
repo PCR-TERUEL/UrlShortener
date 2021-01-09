@@ -34,13 +34,6 @@ public interface ShortURLRepository {
   ShortURL mark(ShortURL urlSafe, boolean safeness);
 
   /**
-   * Update parameters of a ShortURL
-   *
-   * @param su
-   */
-  void update(ShortURL su);
-
-  /**
    * Delete a ShortURL from the repository
    *
    * @param id
