@@ -41,7 +41,7 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public Long count() {
     try {
-      return jdbc.queryForObject("select count(*) from click", Long.class);
+      return jdbc.queryForObject("select count(*) from user", Long.class);
     } catch (Exception e) {
       System.out.println(e);
     }
@@ -66,12 +66,6 @@ public class UserRepositoryImpl implements UserRepository {
     } else {
       return users.get(0);
     }
-  }
-
-  @Override
-  public boolean exists(String userId) {
-    List<User> listUsers =  jdbc.query("SELECT * FROM user WHERE ID = ?", new Object[] {userId}, rowMapper);
-    return listUsers.size() > 0;
   }
 
   @Override

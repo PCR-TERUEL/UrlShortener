@@ -40,6 +40,12 @@ public class ShortURLFixture {
     return new ShortURL("rc3rff2", "http://oracle.com/", null, null,null, new Date(actual.getTime()), null, null, false,
             null, null);
   }
+
+  public static ShortURL urlDelete() {
+    return new ShortURL("delete", "http://www.unizar.es/", null, null,null,  null, null, null, false,
+            null, null);
+  }
+
   /*
   public static ShortURL urlSponsor() {
     return new ShortURL("3", null, null, "sponsor", null,null, null, null,

@@ -55,4 +55,9 @@ public class User implements Serializable {
   public void setRoleId(int roleId) {
     this.roleId = roleId;
   }
+
+  @Override
+  public String toString() {
+    return "{" + id + "," + username + "," + password + "," + roleId + "}";
+  }
 }

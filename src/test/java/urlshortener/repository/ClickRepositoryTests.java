@@ -47,7 +47,7 @@ public class ClickRepositoryTests {
     assertNotNull(click);
     assertNotNull(click.getId());
   }
-/*
+
   @Test
   public void thatErrorsInSaveReturnsNull() {
     assertNull(repository.save(ClickFixture.click(ShortURLFixture.badUrl())));
@@ -55,37 +55,6 @@ public class ClickRepositoryTests {
         Integer.class), 0);
   }
 
-  @Test
-  public void thatFindByKeyReturnsAURL() {
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    assertEquals(repository.findByHash(ShortURLFixture.url1().getHash()).size(), 3);
-    assertEquals(repository.findByHash(ShortURLFixture.url2().getHash()).size(), 2);
-  }
-
-  @Test
-  public void thatFindByKeyReturnsEmpty() {
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    assertEquals(repository.findByHash(ShortURLFixture.badUrl().getHash()).size(), 0);
-  }
-
-  @Test
-  public void thatDeleteDelete() {
-    Long id1 = repository.save(ClickFixture.click(ShortURLFixture.url1())).getId();
-    Long id2 = repository.save(ClickFixture.click(ShortURLFixture.url2())).getId();
-    repository.delete(id1);
-    assertEquals(repository.count().intValue(), 1);
-    repository.delete(id2);
-    assertEquals(repository.count().intValue(), 0);
-  }
-*/
   @After
   public void shutdown() {
     db.shutdown();

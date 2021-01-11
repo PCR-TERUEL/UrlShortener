@@ -36,16 +36,6 @@ public class ClickRepositoryImpl implements ClickRepository {
     this.jdbc = jdbc;
   }
 
-  @Override
-  public List<Click> findByHash(String hash) {
-    try {
-      return jdbc.query("SELECT * FROM click WHERE hash=?",
-          new Object[] {hash}, rowMapper);
-    } catch (Exception e) {
-      log.debug("When select for hash " + hash, e);
-      return Collections.emptyList();
-    }
-  }
 
   @Override
   public Click save(final Click cl) {
@@ -85,58 +75,5 @@ public class ClickRepositoryImpl implements ClickRepository {
     return cl;
   }
 
-
-  @Override
-  public void delete(Long id) {
-    try {
-      jdbc.update("delete from click where id=?", id);
-    } catch (Exception e) {
-      log.debug("When delete for id " + id, e);
-    }
-  }
-
-  @Override
-  public void deleteAll() {
-    try {
-      jdbc.update("delete from click");
-    } catch (Exception e) {
-      log.debug("When delete all", e);
-    }
-  }
-
-  @Override
-  public Long count() {
-    try {
-      return jdbc
-          .queryForObject("select count(*) from click", Long.class);
-    } catch (Exception e) {
-      log.debug("When counting", e);
-    }
-    return -1L;
-  }
-
-  @Override
-  public List<Click> list(Long limit, Long offset) {
-    try {
-      return jdbc.query("SELECT * FROM click LIMIT ? OFFSET ?",
-          new Object[] {limit, offset}, rowMapper);
-    } catch (Exception e) {
-      log.debug("When select for limit " + limit + " and offset "
-          + offset, e);
-      return Collections.emptyList();
-    }
-  }
-
-  @Override
-  public Long clicksByHash(String hash) {
-    try {
-      return jdbc
-          .queryForObject("select count(*) from click where hash = ?", new Object[] {hash},
-              Long.class);
-    } catch (Exception e) {
-      log.debug("When counting hash " + hash, e);
-    }
-    return -1L;
-  }
 
 }

@@ -59,7 +59,6 @@ public class MetricQueueMessage {
         return metrics;
     }
 
-
     public String getIdUser() {
         return idUser;
     }

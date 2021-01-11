@@ -45,14 +45,6 @@ public interface UserRepository {
   List<User> getUsers();
 
   /**
-   * Check if user exists
-   *
-   * @param userId
-   * @return exists?
-   */
-  boolean exists(String userId);
-
-  /**
    * Delete a user
    *
    * @param userId

@@ -31,17 +31,14 @@ public class ShortURLRepositoryTests {
             .setName("testDB;MODE=MySQL")
             .addScript("bischema-mysql.sql").build();
     jdbc = new JdbcTemplate(db);
-    ShortURLRepository shortUrlRepository = new ShortURLRepositoryImpl(jdbc);
-    //shortUrlRepository.save(ShortURLFixture.url1());
-    //shortUrlRepository.save(ShortURLFixture.url2());
     repository = new ShortURLRepositoryImpl(jdbc);
   }
 
   @Test
   public void thatSavePersistsTheShortURL() {
     assertNotNull(repository.save(url1()));
-    assertSame(jdbc.queryForObject("select count(*) from SHORTURL",
-        Integer.class), 2);
+    assertSame(1, jdbc.queryForObject("select count(*) from SHORTURL",
+        Integer.class));
   }
 
   @Test
@@ -49,21 +46,20 @@ public class ShortURLRepositoryTests {
     repository.save(url1());
     assertNull(repository.save(url1()));
     assertSame(jdbc.queryForObject("select count(*) from SHORTURL",
-            Integer.class), 2);
+            Integer.class), 1);
   }
 
   @Test
   public void thatErrorsInSaveReturnsNull() {
     assertNull(repository.save(badUrl()));
-    assertSame(jdbc.queryForObject("select count(*) from SHORTURL",
-            Integer.class), 1);
+    assertSame(0, jdbc.queryForObject("select count(*) from SHORTURL",
+            Integer.class));
   }
 
   @Test
   public void thatFindByKeyReturnsAURL() {
     repository.save(url1());
     ShortURL su = repository.findByKey(url1().getHash());
-    assertNotNull(su);
     assertSame(su.getHash(), url1().getHash());
   }
 
@@ -84,8 +80,9 @@ public class ShortURLRepositoryTests {
 
   @Test
   public void thatDeleteDelete() {
-    repository.delete(url1().getHash());
-    assertEquals(repository.count().intValue(), 1);
+    repository.save(urlDelete());
+    repository.delete(urlDelete().getHash());
+    assertSame(repository.count(), 0L);
   }
 
   @Test
