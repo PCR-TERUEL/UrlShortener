@@ -5,12 +5,14 @@ public class ValidationMessage {
     private String url;
     private Boolean valid;
     private Boolean isCSV;
+    private Boolean validationMessage;
 
     public ValidationMessage(String shortUrl, Boolean valid, String url, Boolean isCSV) {
         this.shortUrl = shortUrl;
         this.valid = valid;
         this.isCSV = isCSV;
         this.url = url;
+        this.validationMessage = true;
     }
 
     public String getShortUrl() {
@@ -27,5 +29,9 @@ public class ValidationMessage {
 
     public Boolean getCSV() {
         return isCSV;
+    }
+
+    public Boolean getValidationMessage() {
+        return validationMessage;
     }
 }

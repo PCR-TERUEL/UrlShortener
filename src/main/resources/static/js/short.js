@@ -56,18 +56,13 @@ function connect() {
         stompClient.subscribe('/user/url_shortener/short_url', function (response) {
             dealMessageFromServer(JSON.parse(response.body));
         });
-        stompClient.subscribe('/user/url_shortener/validation_url', function (validation) {
-            let msg = JSON.parse(validation.body);
-            if(msg.valid) {
-                document.getElementById(msg.shortUrl).href = msg.shortUrl;
-            }
-            if(msg.csv){
-                addUrlCsvFile(msg);
-            }
-        });
     });
 }
 
+/**
+ * Add a line a short Url to the results.csv file and if all url were received download the file.
+ * @param msg: short url to add
+ */
 function addUrlCsvFile(msg) {
     if(msg.valid) {
         retval += msg.url + ";" + msg.shortUrl + ";" + "0\n";
@@ -87,24 +82,24 @@ function addUrlCsvFile(msg) {
  * @param msg message send by the server
  */
 function dealMessageFromServer(msg) {
-    if(!msg.error) {
-        appendRow(msg);
+    if(!msg.validationMessage) {
+        if (!msg.error) {
+            appendRow(msg);
+        }
+    } else {
+        if (msg.valid) {
+            document.getElementById(msg.shortUrl).href = msg.shortUrl;
+        }
+        if (msg.csv) {
+            addUrlCsvFile(msg);
+        }
     }
 }
 
 /**
  * Add a short url receive by message in the table of the GUI.
  * @param msg: message with the data of the short url
- *//*
-function appendRow(msg){
-        var markup
-        markup = "<tr><td class=\"first-column\"><a href=" + msg.target+ ">" + msg.target +"</td>" +
-            "<td><a id=" + msg.uri + ">" +msg.uri + "</td><td class=\"last-column\">" +msg.clicks + "</td></tr>";
-        var tableBody = $("tbody");
-        tableBody.append(markup);
-        $("#feedback").empty();
-}*/
-
+ */
 function appendRow(msg){
     var markup
     if(msg.valid){
