@@ -169,21 +169,20 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           }),
   })
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
+    System.out.println("ENTROOOOOOOOOOOOOOOOOOOOOO");
     UserDetails ud = (UserDetails) (SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
     User u = secureUserService.getUser(ud.getUsername());
-    /*
     if(metricsRepository.contains(u.getId())){
       System.out.println("Getting from metrics");
-
+      taskQueueService.publishMetricJob(u.getId());
       return new ResponseEntity<>(shortUrlService.metricToJSON(metricsRepository.getMetrics(u.getId())), HttpStatus.OK);
     }else{
-     */
       System.out.println("Getting from db");
 
       List<ShortURL> urlShort = shortUrlService.findByUser(String.valueOf(u.getId()));
-      //taskQueueService.publishMetricJob(u.getId());
-      return new ResponseEntity<>(urlShort, HttpStatus.OK);
-   // }
+      taskQueueService.publishMetricJob(u.getId());
+      return new ResponseEntity<>(shortUrlService.toJson(urlShort), HttpStatus.OK);
+    }
   }
 
 

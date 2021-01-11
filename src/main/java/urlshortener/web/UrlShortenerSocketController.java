@@ -39,6 +39,13 @@ public class UrlShortenerSocketController {
         this.taskQueueService = taskQueueService;
     }
 
+    /**
+     * This method receive the requests of short a new URL, create a shortUrl, send the tasks to validate the URL and
+     * response with the shortUrl without validation.
+     * @param petition: message send from the client with the new URL to short
+     * @param sessionId: id of the web socket connection of the client who sent the message.
+     * @return the shortUrl without validation of the new URL. But if are a problem send a message without the shortURL.
+     */
     @Async
     @MessageMapping("/link")
     @SendToUser("/url_shortener/short_url")
@@ -63,14 +70,14 @@ public class UrlShortenerSocketController {
             System.out.println(su.getUri().toString());
             taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
                     petition.isDocumentCsv());
+            System.out.println("PASE LA PUBLICACIÓN DE LA TAREA");
 
             return outMessage;
         }catch (Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Error");
-            ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(null, true,
-                    petition.getIdToken());
-            return outMessage;
+            return new ShortUrlResponseMessage(new ShortURL(), true,
+                    "null");
         }
     }
 
@@ -84,7 +91,7 @@ public class UrlShortenerSocketController {
         ValidationMessage validationMessage = new ValidationMessage(shortUrl, valid, url, isCSV);
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create();
         accessor.setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, sessionId);
-        simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/validation_url",
+        simpMessageSendingOperations.convertAndSendToUser(sessionId, "/url_shortener/short_url",
                 validationMessage,
                 accessor.getMessageHeaders());
         shortUrlService.validate(url, valid);

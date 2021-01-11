@@ -7,6 +7,7 @@ public class ShortUrlResponseMessage {
     private URI uri;
     private String target;
     private Long clicks;
+    private boolean validationMessage;
 
     private boolean error;
 
@@ -18,6 +19,11 @@ public class ShortUrlResponseMessage {
         this.target = shortURL.getTarget();
         this.clicks = shortURL.getClicks();
         this.error = error;
+        this.validationMessage = false;
+    }
+
+    public boolean isValidationMessage() {
+        return validationMessage;
     }
 
     public URI getUri() {

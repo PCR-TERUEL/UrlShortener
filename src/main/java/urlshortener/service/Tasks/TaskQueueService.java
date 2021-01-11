@@ -9,8 +9,8 @@ import urlshortener.domain.MetricQueueMessage;
 
 
 public class TaskQueueService {
-    public static final String VALIDATION_JOB_QUEUE = "validation_job_d";
-    public static final String VALIDATION_RESPONSE_QUEUE = "validation_resp_d";
+    public static final String VALIDATION_JOB_QUEUE = "validation_job";
+    public static final String VALIDATION_RESPONSE_QUEUE = "validation_resp";
     public static final String METRIC_JOB_QUEUE = "metric_job";
     public static final String METRIC_RESPONSE_QUEUE= "metric_resp";
     public static final String SEPARATOR= "@";
