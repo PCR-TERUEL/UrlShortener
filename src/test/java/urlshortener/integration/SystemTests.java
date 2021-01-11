@@ -1,3 +1,4 @@
+
 package urlshortener.integration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,7 +38,7 @@ public class SystemTests {
 
   @LocalServerPort
   private int port;
-
+/*
   @Test
   public void testHome() {
     ResponseEntity<String> entity = restTemplate.getForEntity("/", String.class);
@@ -114,7 +115,7 @@ public class SystemTests {
     assertThat(rc.read("$.target"), is("http://example.com/"));
     assertThat(rc.read("$.sponsor"), is(nullValue()));
   }
-
+*/
   /*
   @Test
   public void testAuthentication() {
@@ -142,7 +143,7 @@ public class SystemTests {
 
   }
   */
-
+/*
   @Test
   public void testRedirection() throws Exception {
     postLink("http://example.com/");
@@ -157,6 +158,8 @@ public class SystemTests {
     parts.add("url", url);
     return restTemplate.postForEntity("/link", parts, String.class);
   }
+  */
+
 
 
 }

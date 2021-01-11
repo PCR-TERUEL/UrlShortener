@@ -50,7 +50,6 @@ public class UserRepositoryTests {
 
   @Test
   public void thatSaveRole() {
-    System.out.println("aver" + repository.getUsers());
     assertNotNull(repository.save(userRole()));
     assertSame(jdbc.queryForObject("select role from USER",
         Integer.class), 1);
@@ -58,7 +57,6 @@ public class UserRepositoryTests {
 
   @Test
   public void thatSaveADuplicateUserIsSafelyIgnored() {
-    System.out.println("aver" + repository.getUsers());
     repository.save(userDuplicated());
     int nUsersBefore = jdbc.queryForObject("select count(*) from USER",
             Integer.class);
@@ -84,7 +82,6 @@ public class UserRepositoryTests {
   public void thatCountCounts() {
     repository.save(user1());
     repository.save(userRole());
-    System.out.println("aver0"+repository.getUsers());
     assertSame(2L, repository.count());
   }
 

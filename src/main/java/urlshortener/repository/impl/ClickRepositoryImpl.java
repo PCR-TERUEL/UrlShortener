@@ -44,7 +44,7 @@ public class ClickRepositoryImpl implements ClickRepository {
       jdbc.update(conn -> {
         PreparedStatement ps = conn
             .prepareStatement(
-                "INSERT INTO urlshortener.click" +
+                "INSERT INTO click" +
                         "(REFERRER, BROWSER, PLATFORM, IP, COUNTRY, HASH) " +
                         "VALUES(?,?,?,?,?,?);",
                 Statement.RETURN_GENERATED_KEYS);
