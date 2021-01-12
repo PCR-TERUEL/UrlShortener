@@ -104,15 +104,10 @@ import org.springframework.web.context.WebApplicationContext;
               .andExpect(status().isOk())
               .andExpect(content().contentType("application/json"))
               .andExpect(jsonPath("$.length()", is(1)))
-              .andExpect(jsonPath("$[0].hash", is("09bb6428")))
-              .andExpect(jsonPath("$[0].target", is("https://www.live.com")))
-              .andExpect(jsonPath("$[0].created", is(1609887600000L)))
-              .andExpect(jsonPath("$[0].expiration", is(-3600000)))
-              .andExpect(jsonPath("$[0].owner", is(2)))
-              .andExpect(jsonPath("$[0].mode", is(307)))
-              .andExpect(jsonPath("$[0].safe", is(true)))
-              .andExpect(jsonPath("$[0].clicks", is(0)))
-              .andExpect(jsonPath("$[0].validated", is(true)));
+              .andExpect(jsonPath("$.urlList[0].uri", containsString("09bb6428")))
+              .andExpect(jsonPath("$.urlList[0].target", is("https://www.live.com")))
+              .andExpect(jsonPath("$.urlList[0].clicks", is(0)))
+              .andExpect(jsonPath("$.urlList[0].valid", is(true)));
     }
 
     @Test

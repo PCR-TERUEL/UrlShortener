@@ -3,9 +3,6 @@ package urlshortener.new_integration;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,8 +10,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.File;
 import java.util.List;
+
+import static org.junit.Assert.*;
+
 
 public class StepDefinitions {
     WebDriver driver;
@@ -23,7 +25,7 @@ public class StepDefinitions {
     public void openChromeAndLaunch() throws Throwable {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("http://localhost:8080/");
+        driver.get("http://localhost:" + 8080 + "/");
     }
 
     @And("^Welcome page will be displayed$")
@@ -61,7 +63,7 @@ public class StepDefinitions {
     }
     @Then("^Panel page will be displayed$")
     public void redirectsToPanel() throws Throwable {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/panel");
     }
 
@@ -81,22 +83,64 @@ public class StepDefinitions {
 
     @Then("Gets an invalidated shorted URL")
     public void invalidatedShortedURL() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(1500);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
-        String row = tableRows.get(1).getAttribute("innerHTML");
+        String row = tableRows.get(2).getAttribute("innerHTML");
         String[] fields = row.split("</td>");
         assertEquals(false, fields[1].contains("href"));
     }
 
     @Then("Gets a validated and shorted URL")
     public void validatedShortedURL() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        assertFalse(tableRows.isEmpty());
         String row = tableRows.get(1).getAttribute("innerHTML");
         String[] fields = row.split("</td>");
         assertEquals(true, fields[1].contains("href"));
+    }
+
+    @Then("Is redirected to target URL successfully")
+    public void validURLredirectsToTarget() throws InterruptedException {
+        Thread.sleep(2000);
+        WebElement baseTable = driver.findElement(By.className("styled-table"));
+        List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        String url = tableRows.get(1).getText().split(" ")[1];
+        driver.get(url);
+        assertEquals(driver.getCurrentUrl(), "https://www.forocoches.com/");
+    }
+
+    @And("Number of clicks is incremented by 1")
+    public void nClickIsIncrementedByOne() throws InterruptedException {
+        Thread.sleep(2000);
+        WebElement baseTable = driver.findElement(By.className("styled-table"));
+        List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        String nClicks = tableRows.get(1).getText().split(" ")[2];
+        assertEquals("1", nClicks);
+    }
+
+    @When("Uploads a CSV file")
+    public void uploadsACSVFile() throws InterruptedException {
+        Thread.sleep(2000);
+        File file = new File("src/test/resources/urls.csv");
+        System.out.println(file.getAbsolutePath());
+        driver.findElement(By.id("upload")).sendKeys(file.getAbsolutePath());
+    }
+
+    @Then("All URL's from the CSV are properly loaded")
+    public void allURLSareProperlyLoaded() throws InterruptedException {
+        Thread.sleep(10000);
+        WebElement baseTable = driver.findElement(By.className("styled-table"));
+        List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        assertEquals(tableRows.size(), 12);
+
+        for (int i = 0; i < tableRows.size(); i++) {
+            String row = tableRows.get(i).getAttribute("innerHTML");
+            String[] fields = row.split("</td>");
+            assertEquals(true, fields[1].contains("href"));
+        }
     }
 
 
@@ -104,6 +148,7 @@ public class StepDefinitions {
     public void closeChrome() throws Throwable {
         driver.close();
     }
+
 
 
 }

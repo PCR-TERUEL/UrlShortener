@@ -3,66 +3,36 @@ package urlshortener.integration;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@WebAppConfiguration
 @DirtiesContext
 public class SystemTests {
-  private static Selenium selenium;
 
   @Autowired
   private TestRestTemplate restTemplate;
 
-  @Value("${local.server.port}")
+  @LocalServerPort
   private int port;
-
-  @BeforeClass
-  public static void setUp() {
-    selenium = new Selenium();
-  }
-/*
-  @Test
-  public void testHome() {
-    ResponseEntity<String> entity = restTemplate.getForEntity("/", String.class);
-    assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-    assertNotNull(entity.getHeaders().getContentType());
-    assertTrue(
-        entity.getHeaders().getContentType().isCompatibleWith(new MediaType("text", "html")));
-    assertThat(entity.getBody(), containsString("<title>URL"));
-  }
 
   @Test
   public void testLogin() {
@@ -114,89 +84,6 @@ public class SystemTests {
       assertThat(entity.getStatusCode(), is(HttpStatus.OK));
     }
 
-  }
-
-  @Test
-  public void testCreateLink() throws Exception {
-    ResponseEntity<String> entity = postLink("http://example.com/");
-
-    assertThat(entity.getStatusCode(), is(HttpStatus.CREATED));
-    assertThat(entity.getHeaders().getLocation(),
-        is(new URI("http://localhost:" + this.port + "/f684a3c4")));
-    assertThat(entity.getHeaders().getContentType(), is(new MediaType("application", "json")));
-    ReadContext rc = JsonPath.parse(entity.getBody());
-    assertThat(rc.read("$.hash"), is("f684a3c4"));
-    assertThat(rc.read("$.uri"), is("http://localhost:" + this.port + "/f684a3c4"));
-    assertThat(rc.read("$.target"), is("http://example.com/"));
-    assertThat(rc.read("$.sponsor"), is(nullValue()));
-  }
-
-  /*
-  @Test
-  public void testAuthentication() {
-    MultiValueMap<String, String> parametersMap = new LinkedMultiValueMap<>();
-    parametersMap.add("username", "user");
-    parametersMap.add("password", "1234");
-
-    RestTemplate restTemplate = new RestTemplate();
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-    HttpClient httpClient = HttpClientBuilder.create()
-            .setRedirectStrategy(new LaxRedirectStrategy())
-            .build();
-    factory.setHttpClient(httpClient);
-    restTemplate.setRequestFactory(factory);
-
-    ResponseEntity<String> entity = restTemplate.postForEntity("/authenticate", parametersMap, String.class);
-    System.out.println(entity.getStatusCode());
-    System.out.println("Body: " + entity.getBody());
-    ReadContext rc = JsonPath.parse(entity.getBody());
-
-    System.out.println(entity.getBody());
-    jwtUserToken = rc.read("$.token");
-
-    assertNotNull(rc.read("$.token"));
-
-  }
-  */
-
-  @Test
-  public void thatSuccessfulLoginRedirectsToPanel() {
-    selenium.login(port);
-
-    //Expected and ActualURL
-    String expectedURL = "https://localhost " + port +"/panel";
-
-    String actualURL = selenium.getCurrentUrl();
-    System.out.println(selenium.getCurrentUrl());
-
-    //Assertion and verification of expected URL and actual URL
-    assertEquals(actualURL, expectedURL);
-
-    //Assertion and verification of expected Page Title and actual Page Title
-  }
-
-  /*
-  @Test
-  public void testRedirection() throws Exception {
-    postLink("http://example.com/");
-
-    ResponseEntity<String> entity = restTemplate.getForEntity("/r/f684a3c4", String.class);
-    assertThat(entity.getStatusCode(), is(HttpStatus.TEMPORARY_REDIRECT));
-    assertThat(entity.getHeaders().getLocation(), is(new URI("http://example.com/")));
-  }
-
-  private ResponseEntity<String> postLink(String url) {
-    MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-    parts.add("url", url);
-    return restTemplate.postForEntity("/link", parts, String.class);
-  }
-
-
-*/
-
-  @AfterClass
-  public static void tearDown() {
-    selenium.tearDown();
   }
 
 

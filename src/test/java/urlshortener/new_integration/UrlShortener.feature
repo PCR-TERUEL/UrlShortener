@@ -32,4 +32,31 @@ Feature: Manage user
     Then Gets an invalidated shorted URL
     Then Closes Chrome
 
+  Scenario: User access shortedURL
+    Given Open the Chrome and launch the application
+    And Welcome page will be displayed
+    When User visits login page
+    And User input and submit login form
+    Then Panel page will be displayed
+    Then Is redirected to target URL successfully
+    Then Closes Chrome
+
+  Scenario: Number of clicks is incremented
+    Given Open the Chrome and launch the application
+    And Welcome page will be displayed
+    When User visits login page
+    And User input and submit login form
+    Then Panel page will be displayed
+    And Number of clicks is incremented by 1
+    Then Closes Chrome
+
+  Scenario: CSV Short
+    Given Open the Chrome and launch the application
+    And Welcome page will be displayed
+    When User visits login page
+    And User input and submit login form
+    Then Panel page will be displayed
+    When Uploads a CSV file
+    #Then All URL's are created and verified
+    Then Closes Chrome
 
