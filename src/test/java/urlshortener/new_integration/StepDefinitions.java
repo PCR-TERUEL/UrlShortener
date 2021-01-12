@@ -65,11 +65,28 @@ public class StepDefinitions {
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/panel");
     }
 
-    @When("User input and submit a URL")
-    public void userInputAndSubmitAURL() throws InterruptedException {
+    @When("User input and submit a valid URL")
+    public void userInputAndSubmitValidURL() throws InterruptedException {
         driver.findElement(By.id("id-url-input")).sendKeys("https://www.forocoches.com");
         Thread.sleep(1000);
         driver.findElement(By.className("col-md-4")).click();
+    }
+
+    @When("User input and submit an invalid URL")
+    public void userInputAndSubmitInvalidURL() throws InterruptedException {
+        driver.findElement(By.id("id-url-input")).sendKeys("https://invalid");
+        Thread.sleep(1000);
+        driver.findElement(By.className("col-md-4")).click();
+    }
+
+    @Then("Gets an invalidated shorted URL")
+    public void invalidatedShortedURL() throws InterruptedException {
+        Thread.sleep(1000);
+        WebElement baseTable = driver.findElement(By.className("styled-table"));
+        List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        String row = tableRows.get(1).getAttribute("innerHTML");
+        String[] fields = row.split("</td>");
+        assertEquals(false, fields[1].contains("href"));
     }
 
     @Then("Gets a validated and shorted URL")
