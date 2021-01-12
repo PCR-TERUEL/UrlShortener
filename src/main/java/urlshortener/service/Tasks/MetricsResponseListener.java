@@ -4,14 +4,14 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import urlshortener.domain.MetricQueueMessage;
-import urlshortener.repository.impl.MetricsRepository;
+import urlshortener.repository.impl.MetricsRepositoryImpl;
 
 
 @RabbitListener(queues = TaskQueueService.METRIC_RESPONSE_QUEUE)
 public class MetricsResponseListener {
 
     @Autowired
-    private MetricsRepository metricsRepository;
+    private MetricsRepositoryImpl metricsRepository;
 
 
     @RabbitHandler

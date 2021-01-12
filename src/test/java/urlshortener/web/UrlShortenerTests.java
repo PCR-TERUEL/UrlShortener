@@ -170,7 +170,7 @@ import org.springframework.web.context.WebApplicationContext;
     @Test
     public void thatDeleteUserIsForbidden() throws Exception {
       mvc.perform(delete("/user/2"))
-              .andExpect(status().isMethodNotAllowed());
+              .andExpect(status().isFound());
     }
 
     private String getAccesToken(String username, String password) throws Exception {

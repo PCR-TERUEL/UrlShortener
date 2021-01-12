@@ -5,7 +5,7 @@ import urlshortener.domain.Metric;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public interface MetricsRepositoryImpl {
+public interface MetricsRepository {
 
     public void addMetric(String idUser,List<Metric> m);
 
