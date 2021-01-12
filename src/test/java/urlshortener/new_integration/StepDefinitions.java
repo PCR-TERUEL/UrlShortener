@@ -10,7 +10,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.util.List;
@@ -25,7 +24,7 @@ public class StepDefinitions {
     public void openChromeAndLaunch() throws Throwable {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.get("http://localhost:" + 8080 + "/");
+        driver.get("http://localhost:8080/");
     }
 
     @And("^Welcome page will be displayed$")
