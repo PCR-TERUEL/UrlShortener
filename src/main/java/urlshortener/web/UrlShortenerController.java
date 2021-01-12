@@ -32,7 +32,7 @@ import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
-import urlshortener.repository.impl.MetricsRepositoryImpl;
+import urlshortener.repository.MetricsRepository;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
 
@@ -49,7 +49,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   private AuthenticationManager authenticationManager;
 
   @Autowired
-  private MetricsRepositoryImpl metricsRepository;
+  private MetricsRepository metricsRepository;
 
   @Autowired
   private JWTTokenUtil jwtTokenUtil;

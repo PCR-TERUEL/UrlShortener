@@ -4,13 +4,14 @@ import org.json.simple.JSONObject;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import urlshortener.domain.MetricQueueMessage;
 
 
 public class TaskQueueService {
-    public static final String VALIDATION_JOB_QUEUE = "validation_job_d";
-    public static final String VALIDATION_RESPONSE_QUEUE = "validation_resp_d";
+    public static final String VALIDATION_JOB_QUEUE = "validation_job";
+    public static final String VALIDATION_RESPONSE_QUEUE = "validation_resp";
     public static final String METRIC_JOB_QUEUE = "metric_job";
     public static final String METRIC_RESPONSE_QUEUE= "metric_resp";
     public static final String SEPARATOR= "@";
@@ -33,6 +34,7 @@ public class TaskQueueService {
         System.out.println(" [x] Sent VALIDATION"+ tasks.getName() + "'" + message + "'");
     }
 
+    @Async
     public void publishMetricJob(String idUser) {
         JSONObject obj = new JSONObject();
         obj.put(MetricQueueMessage.ID_USER_FIELD_NAME, idUser);

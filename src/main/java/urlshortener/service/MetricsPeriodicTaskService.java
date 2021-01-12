@@ -6,7 +6,7 @@ import urlshortener.repository.impl.MetricsRepositoryImpl;
 import urlshortener.service.Tasks.TaskQueueService;
 
 
-public class VallidationPeriodicTaskService {
+public class MetricsPeriodicTaskService {
     int cont = 0;
     int last = -1;
     @Autowired
