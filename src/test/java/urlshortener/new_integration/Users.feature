@@ -26,6 +26,10 @@ Feature: Manage user
     When User visits login page
     And User input and submit login form
     Then Panel page will be displayed
-    When User input and submit a URL
+    When User input and submit a valid URL
     Then Gets a validated and shorted URL
+    When User input and submit an invalid URL
+    Then Gets an invalidated shorted URL
     Then Closes Chrome
+
+
