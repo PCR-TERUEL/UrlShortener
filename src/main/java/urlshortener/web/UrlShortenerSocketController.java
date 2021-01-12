@@ -70,7 +70,6 @@ public class UrlShortenerSocketController {
             System.out.println(su.getUri().toString());
             taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
                     petition.isDocumentCsv());
-            System.out.println("PASE LA PUBLICACIÓN DE LA TAREA");
 
             return outMessage;
         }catch (Exception e){

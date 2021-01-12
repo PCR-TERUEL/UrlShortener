@@ -14,7 +14,6 @@ $(document).ready(function () {
     getData();
     connect();
     $(".btn-get-started").click(function () {
-        numUrlsCsvSends++;
         stompClient.send("/app/link", {}, JSON.stringify({url: $("#id-url-input").val(),
             idToken: getCookie("token"), numMonth: $("#id-expired-input").val()}));
     });
