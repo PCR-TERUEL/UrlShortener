@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
+import static urlshortener.fixtures.ShortURLFixture.url1;
 
 
 import org.junit.After;
@@ -19,6 +20,7 @@ import urlshortener.fixtures.ClickFixture;
 import urlshortener.fixtures.ShortURLFixture;
 import urlshortener.repository.impl.ClickRepositoryImpl;
 import urlshortener.repository.impl.ShortURLRepositoryImpl;
+import urlshortener.repository.impl.UserRepositoryImpl;
 
 public class ClickRepositoryTests {
 
@@ -31,23 +33,22 @@ public class ClickRepositoryTests {
     db = new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .setName("testDB;MODE=MySQL")
-            .addScript("schema.sql").build();
+            .addScript("bischema-mysql.sql").build();
     jdbc = new JdbcTemplate(db);
     ShortURLRepository shortUrlRepository = new ShortURLRepositoryImpl(jdbc);
-    shortUrlRepository.save(ShortURLFixture.url1());
-    //shortUrlRepository.save(ShortURLFixture.url2());
+    shortUrlRepository.save(url1());
     repository = new ClickRepositoryImpl(jdbc);
   }
 
   @Test
   public void thatSavePersistsTheClickURL() {
-    Click click = repository.save(ClickFixture.click(ShortURLFixture.url1()));
+    Click click = repository.save(ClickFixture.click(url1()));
     assertSame(jdbc.queryForObject("select count(*) from CLICK",
         Integer.class), 1);
     assertNotNull(click);
     assertNotNull(click.getId());
   }
-/*
+
   @Test
   public void thatErrorsInSaveReturnsNull() {
     assertNull(repository.save(ClickFixture.click(ShortURLFixture.badUrl())));
@@ -55,37 +56,6 @@ public class ClickRepositoryTests {
         Integer.class), 0);
   }
 
-  @Test
-  public void thatFindByKeyReturnsAURL() {
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    assertEquals(repository.findByHash(ShortURLFixture.url1().getHash()).size(), 3);
-    assertEquals(repository.findByHash(ShortURLFixture.url2().getHash()).size(), 2);
-  }
-
-  @Test
-  public void thatFindByKeyReturnsEmpty() {
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    repository.save(ClickFixture.click(ShortURLFixture.url2()));
-    repository.save(ClickFixture.click(ShortURLFixture.url1()));
-    assertEquals(repository.findByHash(ShortURLFixture.badUrl().getHash()).size(), 0);
-  }
-
-  @Test
-  public void thatDeleteDelete() {
-    Long id1 = repository.save(ClickFixture.click(ShortURLFixture.url1())).getId();
-    Long id2 = repository.save(ClickFixture.click(ShortURLFixture.url2())).getId();
-    repository.delete(id1);
-    assertEquals(repository.count().intValue(), 1);
-    repository.delete(id2);
-    assertEquals(repository.count().intValue(), 0);
-  }
-*/
   @After
   public void shutdown() {
     db.shutdown();

@@ -6,16 +6,20 @@ import urlshortener.domain.User;
 public class UserFixture {
 
   public static User user1() {
-    return new User("-1", "usertest", "1234", 1);
+    return new User("1", "usertest", "1234", 2);
   }
 
   public static User userRole() {
-    return new User("-1", "usertest", "1234", 1);
+    return new User("2", "role", "1234", 1);
   }
 
   public static User userDuplicated() {
-    return new User("-1", "userdup", "1234", 1);
+    return new User("3", "userdup", "1234", 1);
   }
+  public static User userDelete() {
+    return new User("4", "delete", "1234", 1);
+  }
+
 
   public static User userFind() {
     return new User("-1", "userfind", "1234", 1);

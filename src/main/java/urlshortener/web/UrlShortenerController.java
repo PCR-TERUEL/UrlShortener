@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpHeaders;
@@ -22,20 +21,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import urlshortener.config.JWTTokenUtil;
 import urlshortener.domain.JWT;
 import urlshortener.domain.ShortURL;
 import urlshortener.domain.User;
-import urlshortener.repository.impl.MetricsRepository;
+import urlshortener.repository.impl.MetricsRepositoryImpl;
 import urlshortener.service.*;
 import urlshortener.service.Tasks.TaskQueueService;
 
@@ -52,7 +49,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   private AuthenticationManager authenticationManager;
 
   @Autowired
-  private MetricsRepository metricsRepository;
+  private MetricsRepositoryImpl metricsRepository;
 
   @Autowired
   private JWTTokenUtil jwtTokenUtil;
@@ -169,7 +166,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           }),
   })
   public ResponseEntity<?> getUserLinks(HttpServletRequest request) throws URISyntaxException {
-    System.out.println("ENTROOOOOOOOOOOOOOOOOOOOOO");
     UserDetails ud = (UserDetails) (SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
     User u = secureUserService.getUser(ud.getUsername());
     if(metricsRepository.contains(u.getId())){
