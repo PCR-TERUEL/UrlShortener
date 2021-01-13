@@ -57,6 +57,6 @@ Feature: Manage user
     And User input and submit login form
     Then Panel page will be displayed
     When Uploads a CSV file
-    #Then All URL's are created and verified
+    Then All URL's from the CSV are properly loaded
     Then Closes Chrome
 
