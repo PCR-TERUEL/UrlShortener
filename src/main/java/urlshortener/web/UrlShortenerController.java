@@ -182,7 +182,7 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
   }
 
 
-  @PostMapping(value = "/users-information")
+  @GetMapping(value = "/users-information")
   @Operation(summary = "Get all users information")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "All users retrieved successfully", content = {
