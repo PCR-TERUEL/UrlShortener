@@ -63,7 +63,7 @@ public class UrlShortenerSocketController {
                 } else {
                     numMonth = Integer.parseInt(petition.getNumMonth());
                 }
-            } catch (NullPointerException exception){ // | NumberFormatException exception){
+            } catch (NullPointerException exception){
                 numMonth = -1;
             } catch(NumberFormatException exception){
                 return new ShortUrlResponseMessage(new ShortURL(), true,
