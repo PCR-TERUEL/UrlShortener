@@ -100,7 +100,7 @@ public class StepDefinitions {
 
     @Then("Gets a validated and shorted URL")
     public void validatedShortedURL() throws InterruptedException {
-        Thread.sleep(4000);
+        Thread.sleep(10000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         assertFalse(tableRows.isEmpty());
