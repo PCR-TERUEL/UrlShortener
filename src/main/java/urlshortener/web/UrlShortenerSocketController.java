@@ -58,7 +58,11 @@ public class UrlShortenerSocketController {
             User u = secureUserService.getUser(username);
 
             try {
-                numMonth = Integer.parseInt(petition.getNumMonth());
+                if(petition.getNumMonth().equals("")){
+                    numMonth = -1;
+                } else {
+                    numMonth = Integer.parseInt(petition.getNumMonth());
+                }
             } catch (NullPointerException exception){ // | NumberFormatException exception){
                 numMonth = -1;
             } catch(NumberFormatException exception){
