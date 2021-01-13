@@ -67,3 +67,10 @@ dependencies {
 clean.doFirst {
     delete "db"
 }
+
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
+}
