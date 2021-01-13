@@ -120,7 +120,7 @@ import org.springframework.web.context.WebApplicationContext;
     @WithMockUser("admin")
     @Test
     public void thatGetUsersInformationIsSuccessful() throws Exception {
-      mvc.perform(post("/users-information")
+      mvc.perform(get("/users-information")
               .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isOk())
               .andExpect(content().contentType("application/json"))
@@ -138,7 +138,7 @@ import org.springframework.web.context.WebApplicationContext;
 
     @Test
     public void thatGetUsersInformationIsForbidden() throws Exception {
-      mvc.perform(post("/users-information")
+      mvc.perform(get("/users-information")
               .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isFound());
 

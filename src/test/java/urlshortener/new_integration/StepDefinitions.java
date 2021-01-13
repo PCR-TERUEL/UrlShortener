@@ -105,7 +105,7 @@ public class StepDefinitions {
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         assertFalse(tableRows.isEmpty());
         String row = tableRows.get(1).getAttribute("innerHTML");
-        assertEquals("a",row);
+        //assertEquals("a",row);
         String[] fields = row.split("</td>");
         assertEquals(true, fields[1].contains("href"));
     }
