@@ -59,24 +59,22 @@ public class UrlShortenerSocketController {
 
             try {
                 numMonth = Integer.parseInt(petition.getNumMonth());
-            } catch (NullPointerException | NumberFormatException exception){
+            } catch (NullPointerException exception){ // | NumberFormatException exception){
                 numMonth = -1;
+            } catch(NumberFormatException exception){
+                return new ShortUrlResponseMessage(new ShortURL(), true,
+                        "null");
             }
-            System.out.println("000000--------------000000000");
             ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
                     String.valueOf(u.getId()), "", numMonth);
-            System.out.println("1111111--------------1111111");
             su.setUri(new URI("http://" + UrlShortenerController.HOST + "/r/" + su.getHash()));
             ShortUrlResponseMessage outMessage = new ShortUrlResponseMessage(su, false, petition.getIdToken());
 
-            System.out.println("222222222--------------2222222222");
             taskQueueService.publishValidationJob(sessionId, petition.getUrl(), su.getUri().toString(),
                     petition.isDocumentCsv());
 
             return outMessage;
         }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Error");
             return new ShortUrlResponseMessage(new ShortURL(), true,
                     "null");
         }
