@@ -3,5 +3,5 @@ jdk: openjdk15
 addons:
   chrome: stable
 script: 
-  - gradle build
+   - ./gradlew build --scan -s
   
