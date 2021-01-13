@@ -4,16 +4,20 @@ A UrlShortner fork.
 
 The __project__ is a [Spring Boot](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/) application that offers a minimum set of functionalities shared by all subprojects.
 
-* __Short URL creation service__:  `POST /` creates a shortened URL from a URL in the request parameter `url`.
+* __Short URL creation service__:  `POST /` creates a shortened URL from a URL in the request parameter `url`. Also it provides support for CSV files.
 * __Redirection service__: `GET /{id}` redirects the request to a URL associated with the parameter `id`.
-* __Database service__: Persistence and retrieval of `ShortURL` and `Click` objects.
+* __Database service__: Persistence and retrieval of `ShortURL`, `Click` and `SecureUser` objects.
+* __User service__: User registration and login persistance implemented with Spring Security.
+* __Metrics service__: Pre-calculaated information can be retrived as a cache by using the [Metric repository]https://github.com/PCR-TERUEL/MetricsWorker worker
+* __Validation service__: External service to provide verification on URL's [Metric repository]https://github.com/PCR-TERUEL/MetricsWorker worker
+* __Testing__: The system is tested with Unit and Integration tests.
+* __Frontend Service__: A nice web interface to show all functionality, including WebSockets.
 
+This project has the following dependencies:
+* [Validation repository]https://github.com/PCR-TERUEL/ValidationWorker 
+* [Metric resporitory]https://github.com/PCR-TERUEL/MetricsWorker 
 
-This project depends on the urls validation repository:
-https://github.com/PCR-TERUEL/ValidationWorker 
-
-Link of the cross evaluation presentation:
-https://drive.google.com/file/d/17YJY08EA7NOGW3jRSfDC04LGhFVt6mm1/view?usp=sharing 
+[Cross-evaluation]https://drive.google.com/file/d/17YJY08EA7NOGW3jRSfDC04LGhFVt6mm1/view?usp=sharing 
 
 The application can be run in Linux and macOS as follows:
 
