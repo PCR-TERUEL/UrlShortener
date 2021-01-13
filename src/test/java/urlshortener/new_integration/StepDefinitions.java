@@ -6,6 +6,7 @@ import io.cucumber.java.en.Given;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -27,7 +28,7 @@ public class StepDefinitions {
     public void openChromeAndLaunch() throws Throwable {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        //driver.manage().window().maximize();
+        driver.manage().window().setSize(new Dimension(1920,1080));
         driver.get("http://localhost:8080/");
     }
 
