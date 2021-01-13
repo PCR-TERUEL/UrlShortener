@@ -5,7 +5,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Controller;
 import urlshortener.domain.MetricQueueMessage;
 
 
@@ -15,6 +14,7 @@ public class TaskQueueService {
     public static final String METRIC_JOB_QUEUE = "metric_job";
     public static final String METRIC_RESPONSE_QUEUE= "metric_resp";
     public static final String SEPARATOR= "@";
+
     @Autowired
     private RabbitTemplate template;
 
@@ -23,6 +23,7 @@ public class TaskQueueService {
 
     public void send(String queue, String message) {
         this.template.convertAndSend(tasks.getName(), message);
+
         System.out.println();
         System.out.println(" [x] Sent "+ tasks.getName() + "'" + message + "'");
     }

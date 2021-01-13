@@ -50,6 +50,17 @@ Feature: Manage user
     And Number of clicks is incremented by 1
     Then Closes Chrome
 
+  Scenario: Shorted expired URL will not be accessible
+    Given Open the Chrome and launch the application
+    And Welcome page will be displayed
+    When User visits login page
+    And User input and submit login form
+    Then Panel page will be displayed
+    When Inputs a expired link
+    And Visits the expired URL
+    Then Closes Chrome
+
+
   Scenario: CSV Short
     Given Open the Chrome and launch the application
     And Welcome page will be displayed

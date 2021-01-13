@@ -53,7 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
     try {
       return jdbc.query("SELECT * FROM user LIMIT ? OFFSET ?", new Object[] {limit, offset}, rowMapper);
     } catch (Exception e) {
-      System.out.println();
+
       return Collections.emptyList();
     }
   }

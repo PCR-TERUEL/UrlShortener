@@ -29,8 +29,6 @@ public class ClickService {
     cl = clickRepository.save(cl);
     System.out.println(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" :
             "[" + hash + "] was not saved");
-    log.info(cl != null ? "[" + hash + "] saved with id [" + cl.getId() + "]" :
-        "[" + hash + "] was not saved");
   }
 
 }
