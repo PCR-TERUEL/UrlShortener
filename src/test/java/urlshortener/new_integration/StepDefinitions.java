@@ -96,16 +96,16 @@ public class StepDefinitions {
         String row = tableRows.get(2).getAttribute("innerHTML");
         String[] fields = row.split("</td>");
         assertEquals(false, fields[1].contains("href"));
-        Thread.sleep(9999);
     }
 
     @Then("Gets a validated and shorted URL")
     public void validatedShortedURL() throws InterruptedException {
-        Thread.sleep(3000);
+        Thread.sleep(4000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         assertFalse(tableRows.isEmpty());
         String row = tableRows.get(1).getAttribute("innerHTML");
+        System.out.println(row);
         String[] fields = row.split("</td>");
         assertEquals(true, fields[1].contains("href"));
     }
