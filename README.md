@@ -4,7 +4,7 @@ A UrlShortner fork.
 
 The __project__ is a [Spring Boot](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/) application that offers a minimum set of functionalities shared by all subprojects.
 
-* __Short URL creation service__:  `POST /` creates a shortened URL from a URL in the request parameter `url`. Also it provides support for CSV files.
+* __Short URL creation service__:  `POST /` creates a shortened URL from a URL in the request parameter `url`. It also provides support for CSV files.
 * __Redirection service__: `GET /{id}` redirects the request to a URL associated with the parameter `id`.
 * __Database service__: Persistence and retrieval of `ShortURL`, `Click` and `SecureUser` objects.
 * __User service__: User registration and login persistance implemented with Spring Security.
