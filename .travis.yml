@@ -2,5 +2,9 @@ language: java
 jdk: openjdk15
 addons:
   chrome: stable
+install:
+  - TERM=dumb ./gradlew assemble
 
+script:
+  - TERM=dumb ./gradlew check
   
