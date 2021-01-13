@@ -2,11 +2,7 @@ dist: trusty
 language: java
 jdk: openjdk15
 addons:
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+  chrome: stable
       
 before_script:
   - export DISPLAY=:99.0
