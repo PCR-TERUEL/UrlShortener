@@ -62,13 +62,6 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
 
   }
 
-  @GetMapping(value = "/test")
-  public ResponseEntity<?> test() {
-    //taskQueueService.send("validation_job", "uno");
-    //taskQueueService.publishValidationJob("123", "https://www.eroski.com", "5678", true);
-    return null;
-  }
-
   /**
    * Map static content to root
    *
@@ -202,6 +195,8 @@ public class UrlShortenerController implements WebMvcConfigurer, ErrorController
           @ApiResponse(responseCode = "404", description = "User does not exists"),
   })
   public ResponseEntity<?> deleteUser(@PathVariable int id) {
+    //System.out.println("Hilo -> " + Thread.currentThread().getName());
+
     if (secureUserService.deleteUser(id)){
       return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -22,7 +22,6 @@ import urlshortener.service.SecureUserService;
 @Component
 public class JWTRequestFilter extends OncePerRequestFilter {
 
-
     @Autowired
     private SecureUserService jwtUserDetailsService;
 
@@ -52,12 +51,12 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("JWT: Unable to get JWT Token");
+                logger.warn("JWT: Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT: Token has expired");
+                logger.warn("JWT: Token has expired");
             }
         } else {
-            logger.warn("JWT Token does not begin with Bearer String");
+            logger.info("JWT is not present or does not begin with Bearer String");
         }
 
         validateToken(username, jwtToken, request);
@@ -88,7 +87,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                 // After setting the Authentication in the context, we specify
                 // that the current user is authenticated. So it passes the
                 // Spring Security Configurations successfully.
-                System.out.println("User authorized with role: " + userDetails.getAuthorities());
+                logger.info("User authorized with role: " + userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }

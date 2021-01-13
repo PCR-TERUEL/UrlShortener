@@ -140,7 +140,6 @@ public class ShortURLService {
    * @return
    */
   public boolean isValidated(String id) {
-//    System.out.println("---------------------" + findByKey(id).isValidated());
     return findByKey(id) != null && findByKey(id).isValidated();
   }
   public boolean validate(String url, boolean value){

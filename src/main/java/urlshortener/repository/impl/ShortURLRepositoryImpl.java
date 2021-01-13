@@ -100,8 +100,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
       SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
       java.util.Date actual = df.parse(shortURL.getExpiration().toString());
       java.util.Date noExpired = df.parse(new Date(0).toString());
-      System.out.println("Expiracion" + shortURL.getExpiration().getTime());
-      System.out.println("Actual" + System.currentTimeMillis());
+
       return !actual.equals(noExpired) &&
               shortURL.getExpiration().getTime() < System.currentTimeMillis();
     } catch (Exception e) {

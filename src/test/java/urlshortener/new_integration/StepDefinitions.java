@@ -100,12 +100,12 @@ public class StepDefinitions {
 
     @Then("Gets a validated and shorted URL")
     public void validatedShortedURL() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         assertFalse(tableRows.isEmpty());
         String row = tableRows.get(1).getAttribute("innerHTML");
-        //assertEquals("a",row);
+        System.out.println(row);
         String[] fields = row.split("</td>");
         assertEquals(true, fields[1].contains("href"));
     }
@@ -116,6 +116,7 @@ public class StepDefinitions {
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         String url = tableRows.get(1).getText().split(" ")[1];
+        System.out.println(url);
         driver.get(url);
         assertEquals(driver.getCurrentUrl(), "https://www.forocoches.com/");
     }
@@ -147,9 +148,7 @@ public class StepDefinitions {
         int verified = 0;
 
         for (int i = 1; i < tableRows.size(); i++) {
-            System.out.println("aver" + i);
             String row = tableRows.get(i).getAttribute("innerHTML");
-            System.out.println("aver2"+row);
             String[] fields = row.split("</td>");
             if (fields[1].contains("href")) {
                 verified++;
@@ -167,5 +166,28 @@ public class StepDefinitions {
     }
 
 
+    @When("Inputs a expired link")
+    public void inputsAExpiredLink() throws InterruptedException {
+        driver.findElement(By.id("id-url-input")).sendKeys("https://github.com");
+        driver.findElement(By.id("id-expired-input")).sendKeys("-2");
+        Thread.sleep(1000);
+        driver.findElement(By.className("col-md-4")).click();
+    }
 
+    @And("Visits the expired URL")
+    public void visitsTheExpiredURL() throws InterruptedException {
+        Thread.sleep(6000);
+        WebElement baseTable = driver.findElement(By.className("styled-table"));
+        List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
+        int urlSelect = -1;
+        for (WebElement row : tableRows) {
+            if (row.getText().contains("github")); {
+                urlSelect = tableRows.indexOf(row);
+            }
+        }
+        String url = tableRows.get(urlSelect).getText().split(" ")[1];
+        driver.get(url);
+        assertTrue(driver.getPageSource().contains("Limite temporal invalido"));
+
+    }
 }

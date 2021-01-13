@@ -76,7 +76,6 @@ public class ShortURLBuilder {
       this.expiration = new Date(calendar.getTimeInMillis());
     }
 
-    System.out.println("El numMonth es -> " + numMonth + " y la fecha guardada es ->" + expiration);
     return this;
   }
 
