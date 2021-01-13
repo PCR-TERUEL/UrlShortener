@@ -1,3 +1,4 @@
 language: java
 jdk: openjdk15
-
+addons:
+  chrome: stable

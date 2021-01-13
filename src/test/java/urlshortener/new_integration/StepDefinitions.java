@@ -25,10 +25,8 @@ public class StepDefinitions {
 
     @Given("Open the Chrome and launch the application")
     public void openChromeAndLaunch() throws Throwable {
-        WebDriverManager.edgedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("http://localhost:8080/");
     }
