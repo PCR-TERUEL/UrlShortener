@@ -75,7 +75,7 @@ public class StepDefinitions {
 
     @When("User input and submit a valid URL")
     public void userInputAndSubmitValidURL() throws InterruptedException {
-        driver.findElement(By.id("id-url-input")).sendKeys("https://www.forocoches.com");
+        driver.findElement(By.id("id-url-input")).sendKeys("https://github.com");
         Thread.sleep(1000);
         driver.findElement(By.className("col-md-4")).click();
     }
@@ -95,6 +95,7 @@ public class StepDefinitions {
         String row = tableRows.get(2).getAttribute("innerHTML");
         String[] fields = row.split("</td>");
         assertEquals(false, fields[1].contains("href"));
+        Thread.sleep(9999);
     }
 
     @Then("Gets a validated and shorted URL")
@@ -115,7 +116,7 @@ public class StepDefinitions {
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         String url = tableRows.get(1).getText().split(" ")[1];
         driver.get(url);
-        assertEquals(driver.getCurrentUrl(), "https://www.forocoches.com/");
+        assertEquals(driver.getCurrentUrl(), "https://github.com/");
     }
 
     @And("Number of clicks is incremented by 1")
