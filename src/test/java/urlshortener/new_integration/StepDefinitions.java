@@ -3,6 +3,7 @@ package urlshortener.new_integration;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.File;
 import java.util.List;
@@ -23,11 +25,9 @@ public class StepDefinitions {
 
     @Given("Open the Chrome and launch the application")
     public void openChromeAndLaunch() throws Throwable {
-        if (SystemUtils.IS_OS_WINDOWS) {
-            System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-        } else {
-            System.setProperty("webdriver.chrome.driver", "chromedriver");
-        }
+        WebDriverManager.chromedriver().setup();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("http://localhost:8080/");
