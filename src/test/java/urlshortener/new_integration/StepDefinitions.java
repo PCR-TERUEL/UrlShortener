@@ -69,7 +69,7 @@ public class StepDefinitions {
     }
     @Then("^Panel page will be displayed$")
     public void redirectsToPanel() throws Throwable {
-        Thread.sleep(5000);
+        Thread.sleep(4000);
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/panel");
     }
 
@@ -89,7 +89,7 @@ public class StepDefinitions {
 
     @Then("Gets an invalidated shorted URL")
     public void invalidatedShortedURL() throws InterruptedException {
-        Thread.sleep(1500);
+        Thread.sleep(3000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         String row = tableRows.get(2).getAttribute("innerHTML");
@@ -99,7 +99,7 @@ public class StepDefinitions {
 
     @Then("Gets a validated and shorted URL")
     public void validatedShortedURL() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         assertFalse(tableRows.isEmpty());
@@ -110,7 +110,7 @@ public class StepDefinitions {
 
     @Then("Is redirected to target URL successfully")
     public void validURLredirectsToTarget() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         String url = tableRows.get(1).getText().split(" ")[1];
@@ -120,7 +120,7 @@ public class StepDefinitions {
 
     @And("Number of clicks is incremented by 1")
     public void nClickIsIncrementedByOne() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         WebElement baseTable = driver.findElement(By.className("styled-table"));
         List<WebElement> tableRows = baseTable.findElements(By.tagName("tr"));
         String nClicks = tableRows.get(1).getText().split(" ")[2];
@@ -129,7 +129,7 @@ public class StepDefinitions {
 
     @When("Uploads a CSV file")
     public void uploadsACSVFile() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         File file = new File("src/test/resources/urls.csv");
         System.out.println(file.getAbsolutePath());
         driver.findElement(By.id("upload")).sendKeys(file.getAbsolutePath());
