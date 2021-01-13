@@ -27,7 +27,7 @@ public class StepDefinitions {
     public void openChromeAndLaunch() throws Throwable {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.manage().window().maximize();
+        //driver.manage().window().maximize();
         driver.get("http://localhost:8080/");
     }
 
