@@ -59,8 +59,11 @@ public class UrlShortenerSocketController {
 
             try {
                 numMonth = Integer.parseInt(petition.getNumMonth());
-            } catch (NullPointerException | NumberFormatException exception){
+            } catch (NullPointerException exception){ // | NumberFormatException exception){
                 numMonth = -1;
+            } catch(NumberFormatException exception){
+                return new ShortUrlResponseMessage(new ShortURL(), true,
+                        "null");
             }
             ShortURL su = shortUrlService.save(petition.getUrl(), petition.getSponsor(),
                     String.valueOf(u.getId()), "", numMonth);
@@ -72,8 +75,6 @@ public class UrlShortenerSocketController {
 
             return outMessage;
         }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Error");
             return new ShortUrlResponseMessage(new ShortURL(), true,
                     "null");
         }
