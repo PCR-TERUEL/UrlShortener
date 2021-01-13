@@ -33,19 +33,21 @@ public class StepDefinitions {
 
     @And("^Welcome page will be displayed$")
     public void verifyWelcomeMessage() throws Throwable {
+        Thread.sleep(5000);
         String actualString = driver.findElement(By.className("col-md-6")).getText();
         assertTrue(actualString.contains("Recorta rápidamente\ntus URLs!"));
     }
 
     @When("^User visits login page$")
     public void visitLoginPage() throws Throwable {
+        Thread.sleep(5000);
         driver.findElement(By.className("login")).click();
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/login");
     }
 
     @And("^User input and submit signup form$")
     public void enterAndSubmitSingupForm() throws Throwable {
-        Thread.sleep(100);
+        Thread.sleep(1000);
         driver.findElement(By.id("signUp")).click();
         driver.findElement(By.id("register-username")).sendKeys("prueba");
         driver.findElement(By.id("register-password")).sendKeys("1234");
@@ -62,11 +64,12 @@ public class StepDefinitions {
 
     @Then("^User is registered$")
     public void redirectsToLoginPage() throws Throwable {
+        Thread.sleep(2000);
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/login");
     }
     @Then("^Panel page will be displayed$")
     public void redirectsToPanel() throws Throwable {
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         assertEquals(driver.getCurrentUrl(), "http://localhost:8080/panel");
     }
 
